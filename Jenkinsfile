@@ -60,7 +60,7 @@ pipeline {
     }
 
     post {
-        always {
+        regression {
             sh "echo ${GIT_COMMIT_MSG}"
             discordSend description: "Jenkins Pipeline Build StreamAccess Frontend ${BRANCH_NAME} failed ! ☹️\n\ngit commit message :\n${GIT_COMMIT_MSG}",
             footer: "Better luck next try ?",
