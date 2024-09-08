@@ -49,7 +49,7 @@ pipeline {
 
         stage('Publish to FTP') {
             when {
-                expression { env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev'}
+                expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'dev'}
             }
             steps {
                 echo "branch name : ${BRANCH_NAME}"
