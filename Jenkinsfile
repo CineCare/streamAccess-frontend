@@ -22,7 +22,7 @@ pipeline {
             steps {
                 git branch: '${BRANCH_NAME}',
                 credentialsId: 'github_credentials',
-                url: 'https://github.com/CineCare/cineHub-frontend'
+                url: 'https://github.com/CineCare/streamAccess-frontend'
                 script {
                     env.GIT_COMMIT_MSG = sh (script: 'git log -1 --pretty=%B ${GIT_COMMIT}', returnStdout: true).trim()
                 }
