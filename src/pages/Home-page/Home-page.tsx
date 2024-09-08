@@ -1,5 +1,5 @@
 export default function HomePage () {
   return (
-    <p>yo world</p>
+    <p>Hello world</p>
   )
 }
