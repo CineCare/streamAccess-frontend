@@ -93,7 +93,7 @@ function AuthStatus() {
   const navigate = useNavigate();
 
   if (!auth.user) {
-    return <p>You are not logged in.</p>;
+    return <p>You must be logged in.</p>;
   }
 
   return (
