@@ -1,7 +1,9 @@
 # Projet de Streaming Accessible - StreamAccess
 
 ## Description
-Ce projet est une application web de streaming vidéo à la demande, conçue pour être accessible, inclusive, et modulaire. Le projet vise à offrir une expérience utilisateur de qualité, avec un accent sur l'accessibilité et la personnalisation, tout en servant de base à une thèse de doctorat sur le cinéma thérapeutique.
+Ce projet est une application web de streaming vidéo à la demande, conçue pour être accessible, inclusive, et modulaire. Le projet vise à offrir une expérience utilisateur de qualité, avec un accent sur l'accessibilité et la personnalisation.
+
+<a target="_blank" href="https://docs.google.com/document/d/193HEjxI0iK6uy7enfZTln4PRm8N8PplfEeURyaualiU/edit?usp=sharing">Plus de détails ici</a>
 
 ## Table des matières
 - [Caractéristiques](#caractéristiques)
@@ -37,8 +39,8 @@ Ce projet est une application web de streaming vidéo à la demande, conçue pou
 Pour installer et configurer le projet, suivez ces étapes :
 
 1. **Cloner le dépôt**
-   - git clone https://github.com/CineCare/streamAccess-frontende.git
-   - cd projet-streaming-accessible/frontend
+   - git clone https://github.com/CineCare/streamAccess-frontend.git
+   - cd streamAccess-frontend
 
 2. **Installer les dépendances**
    - npm install
