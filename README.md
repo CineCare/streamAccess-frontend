@@ -1,30 +1,86 @@
-# React + TypeScript + Vite
+# Projet de Streaming Accessible - StreamAccess
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Description
+Ce projet est une application web de streaming vidéo à la demande, conçue pour être accessible, inclusive, et modulaire. Le projet vise à offrir une expérience utilisateur de qualité, avec un accent sur l'accessibilité et la personnalisation, tout en servant de base à une thèse de doctorat sur le cinéma thérapeutique.
 
-Currently, two official plugins are available:
+## Table des matières
+- [Caractéristiques](#caractéristiques)
+- [Technologies utilisées](#technologies-utilisées)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Structure du projet](#structure-du-projet)
+- [Utilisation](#utilisation)
+- [Tests](#tests)
+- [License](#license)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Caractéristiques
+- Streaming vidéo à la demande
+- Interface utilisateur accessible et personnalisable
+- Options de voix et de sous-titres adaptées aux utilisateurs
+- Système d'authentification utilisateur
+- Mise en œuvre d'une architecture de composants avec React et Material UI
+- Support pour les retours et les besoins des utilisateurs via un recueil d'informations
 
-## Expanding the ESLint configuration
+## Technologies utilisées
+- **Frontend**
+  - [React](https://reactjs.org/) : Bibliothèque JavaScript pour construire des interfaces utilisateur.
+  - [Vite](https://vitejs.dev/) : Outil de construction pour un développement rapide.
+  - [Material UI](https://mui.com/) : Bibliothèque de composants pour React offrant des styles accessibles.
+  - [Axios](https://axios-http.com/) : Client HTTP pour effectuer des requêtes API.
+  
+- **Backend**
+  - [NestJS](https://nestjs.com/) : Cadre de développement pour construire des applications serveur.
+  - [Prisma](https://www.prisma.io/) : Outil ORM pour interagir avec la base de données.
+  - [PostgreSQL](https://www.postgresql.org/) : Système de gestion de base de données relationnelle.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Installation
+Pour installer et configurer le projet, suivez ces étapes :
 
-- Configure the top-level `parserOptions` property like this:
+1. **Cloner le dépôt**
+   - git clone https://github.com/username/projet-streaming-accessible.git
+   - cd projet-streaming-accessible/frontend
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json', './tsconfig.app.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+2. **Installer les dépendances**
+   - npm install
+
+3. **Lancer l'application en mode développement**
+   - npm run dev
+
+## Configuration
+Avant de commencer le développement, assurez-vous d'avoir installé Node.js et npm. Configurez les variables d'environnement nécessaires dans un fichier `.env` à la racine du projet :
+
+REACT_APP_API_URL=http://localhost:5000/api
+
+## Structure du projet
+```
+/frontend
+├── /public          # Fichiers statiques
+├── /src             # Code source de l'application
+│   ├── /components  # Composants React
+│   ├── /services    # Services pour les appels API
+│   ├── /styles      # Styles globaux et thèmes
+│   ├── App.jsx      # Composant principal
+│   └── index.jsx    # Point d'entrée de l'application
+├── .env             # Variables d'environnement
+├── package.json     # Dépendances du projet
+└── README.md        # Documentation du projet
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Utilisation
+Après avoir démarré l'application, ouvrez votre navigateur et accédez à http://localhost:3000. Vous pouvez explorer les films disponibles et utiliser les fonctionnalités d'authentification.
+
+### Exemples d'utilisation
+1. **Navigation dans les films**
+   - Cliquez sur les vignettes des films pour accéder à leurs détails.
+   
+2. **Choix des sous-titres et de la voix**
+   - Sélectionnez les préférences de sous-titres et de voix via les paramètres.
+
+## Tests
+Les tests sont essentiels pour garantir la qualité du code. Utilisez Jest pour exécuter les tests unitaires.
+
+### Exécution des tests
+- npm test
+
+## License
+Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
