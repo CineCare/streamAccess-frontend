@@ -37,7 +37,7 @@ Ce projet est une application web de streaming vidéo à la demande, conçue pou
 Pour installer et configurer le projet, suivez ces étapes :
 
 1. **Cloner le dépôt**
-   - git clone https://github.com/username/projet-streaming-accessible.git
+   - git clone https://github.com/CineCare/streamAccess-frontende.git
    - cd projet-streaming-accessible/frontend
 
 2. **Installer les dépendances**
