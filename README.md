@@ -53,18 +53,28 @@ Avant de commencer le développement, assurez-vous d'avoir installé Node.js et 
 
 REACT_APP_API_URL=http://localhost:5000/api
 
-## Structure du projet
+## Structure du projet (Maj - 27/09/2024)
 ```
 /frontend
 ├── /public          # Fichiers statiques
 ├── /src             # Code source de l'application
+│   ├── /assets      # Fichiers statiques spécifiques à l'UI (polices, images)
 │   ├── /components  # Composants React
+│   ├── /hooks       # Custom hooks
+│   ├── /pages       # Pages principales de l'application (Home, Login, Player, etc.)
+│   ├── /layouts     # Layouts réutilisables pour différentes pages
+│   ├── /utils       # Fonctions utilitaires (formattage de date, helpers)
+│   ├── /providers   # Gestion des états globaux (auth, theme)
+│   ├── /config      # Configuration globale (variables d'environnement, routes)
 │   ├── /services    # Services pour les appels API
 │   ├── /styles      # Styles globaux et thèmes
-│   ├── App.jsx      # Composant principal
-│   └── index.jsx    # Point d'entrée de l'application
-├── .env             # Variables d'environnement
-├── package.json     # Dépendances du projet
+│   ├── index.css    # Style global
+│   └── main.tsx     # Point d'entrée de l'application
+│
+├── vite.config.ts   # Configuration de Vite
+├── package.json     # Dépendances et scripts
+├── package-lock.json# Dépendances et scripts
+├── tsconfig.json    # Configuration TypeScript (si applicable)
 └── README.md        # Documentation du projet
 ```
 
