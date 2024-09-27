@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Routes,Link,
   useLocation,
   Navigate,
   Outlet, } from "react-router-dom";
-import { fakeAuthProvider } from "./auth";
+import { fakeAuthProvider } from "./providers/auth";
 
 import "./index.css";
 import HomePage from "./pages/Home-page/Home-page";
