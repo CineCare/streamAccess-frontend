@@ -8,7 +8,8 @@ pipeline {
     options { buildDiscarder(logRotator(numToKeepStr: '5')) }
 
     environment {
-        FTP_FOLDER = "${env.BRANCH_NAME == 'main' ? 'streamaccess' : "frontend_" + env.BRANCH_NAME}"
+        DOCKER_CREDENTIALS = credentials('codevertDocker')
+        DOCKER_TAG = "${env.BRANCH_NAME == 'main' ? 'latest' : env.BRANCH_NAME}"
     }
     
     stages {
@@ -47,14 +48,42 @@ pipeline {
             }
         }
 
-        stage('Publish to FTP') {
+        // stage('Publish to FTP') {
+        //     when {
+        //         expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'dev'}
+        //     }
+        //     steps {
+        //         echo "branch name : ${BRANCH_NAME}"
+        //         echo "FTP dist folder : ${FTP_FOLDER}"
+        //         ftpPublisher alwaysPublishFromMaster: false, continueOnError: false, failOnError: false, paramPublish: [parameterName:""], masterNodeName: '', publishers: [[configName: 'planethoster', transfers: [[asciiMode: false, cleanRemote: true, excludes: '', flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: "${FTP_FOLDER}", remoteDirectorySDF: false, removePrefix: 'dist/', sourceFiles: 'dist/']], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false]]
+        //     }
+        // }
+        stage('build & push docker image') {
             when {
                 expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'dev'}
             }
             steps {
-                echo "branch name : ${BRANCH_NAME}"
-                echo "FTP dist folder : ${FTP_FOLDER}"
-                ftpPublisher alwaysPublishFromMaster: false, continueOnError: false, failOnError: false, paramPublish: [parameterName:""], masterNodeName: '', publishers: [[configName: 'planethoster', transfers: [[asciiMode: false, cleanRemote: true, excludes: '', flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: "${FTP_FOLDER}", remoteDirectorySDF: false, removePrefix: 'dist/', sourceFiles: 'dist/']], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false]]
+                //connect to docker hub, build image and push to registry
+                sh '''
+                    echo $DOCKER_CREDENTIALS_PSW | docker login localhost:5000 -u $DOCKER_CREDENTIALS_USR --password-stdin
+                    docker build -t "localhost:5000/streamaccess:frontend_${DOCKER_TAG}" .
+                    docker push localhost:5000/streamaccess:frontend_${DOCKER_TAG}
+                '''
+            }
+        }
+
+        stage('Update stack portainer') {
+            when {
+                expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'dev'}
+            }
+            steps {
+                //stop and restart portainer stack via api
+                withCredentials([string(credentialsId: 'portainer_token', variable: 'TOKEN')]) { //set SECRET with the credential content
+                    sh '''
+                        curl -X POST -H "X-API-Key: ${TOKEN}" https://portainer.codevert.org/api/stacks/7/stop?endpointId=2 &&
+                        curl -X POST -H "X-API-Key: ${TOKEN}" https://portainer.codevert.org/api/stacks/7/start?endpointId=2
+                    '''
+                }
             }
         }
     }
