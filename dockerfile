@@ -3,6 +3,6 @@ FROM node
 RUN npm install
 RUN npm run build
 
-FROM staticdeploy/app-server:vX.Y.Z
+FROM staticdeploy/app-server:v4.1.0
 
 COPY --from=0 /dist /build
