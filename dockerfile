@@ -1,7 +1,8 @@
 FROM node
 
-RUN npm install --global @staticdeploy/app-server
+RUN npm install
+RUN npm run build
 
-COPY dist .
+FROM staticdeploy/app-server:vX.Y.Z
 
-CMD ["app-server"]
+COPY --from=0 /dist /build
