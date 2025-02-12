@@ -104,7 +104,8 @@ pipeline {
             footer: "Good job !",
             link: "$BUILD_URL",
             result: currentBuild.currentResult,
-            title: JOB_NAME, webhookURL: "${DISCORD_WEBHOOK}"
+            title: JOB_NAME,
+            webhookURL: "${DISCORD_WEBHOOK}"
         }
     }
 }

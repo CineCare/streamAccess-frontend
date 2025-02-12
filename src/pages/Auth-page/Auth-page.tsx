@@ -10,7 +10,8 @@ import AccessibilityOptions from '../../components/AccessibilityOptions/Accessib
 const AuthPage: React.FC = () => {
   const theme = useTheme();
   const [value, setValue] = useState(0); // 0 pour Signup, 1 pour Login
-
+  
+  //@ts-expect-error event unused
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
