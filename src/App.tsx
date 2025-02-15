@@ -16,7 +16,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<AuthPage />} /> {/* Page d'authentification */}
           <Route path="/movies" element={<MoviesPage />} /> {/* Page du catalogue */}
-          <Route path="/movie" element={<MoviePage />} /> {/* Page du catalogue */}
+          <Route path="/movie/:id" element={<MoviePage />} /> {/* Page du catalogue */}
           {/* Ajoute d'autres routes ici */}
         </Routes>
       </Router>
