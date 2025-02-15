@@ -58,6 +58,7 @@ return (
         height="400"
         image={`https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` || "/images/camera.png"}
         alt={`Affiche du film ${movie.title}`}
+        sx={{ objectFit: "contain" }}
       />
       <CardContent>
         <Typography variant="h3" component="h1" gutterBottom>
