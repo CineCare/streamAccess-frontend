@@ -46,8 +46,8 @@ const AuthPage: React.FC = () => {
       </Tabs>
       <Box sx={{ marginTop: 4 }}>
       {value === 0 && <SignupForm />}
-        {value === 1 && <LoginForm onLogin={() => {}} />}
-        {value === 2 && <AccessibilityOptions />}
+      {value === 1 && <LoginForm />}
+      {value === 2 && <AccessibilityOptions />}
       </Box>
     </Box>
   );
