@@ -17,9 +17,11 @@ const CreateMovie: React.FC = () => {
   const [success, setSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    console.log(`handleChange - Champ modifié : ${name}, Nouvelle valeur : ${value}`);
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -27,6 +29,8 @@ const CreateMovie: React.FC = () => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
+
+    console.log("handleSubmit - Données du formulaire :", formData);
 
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -37,17 +41,25 @@ const CreateMovie: React.FC = () => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
-      formDataToSend.append("releaseYear", formData.releaseYear);
-      formDataToSend.append("image", (document.querySelector('input[name="image"]') as HTMLInputElement).files?.[0] || "");
+      formDataToSend.append("releaseYear", String(parseInt(formData.releaseYear))); // Convertir en string
+
+      const imageFile = (document.querySelector('input[name="image"]') as HTMLInputElement).files?.[0];
+      if (imageFile) {
+        formDataToSend.append("image", imageFile);
+      }
+
       if (formData.producerId) {
-    formDataToSend.append("producerId", formData.producerId);
-  }
-  if (formData.directorId) {
-    formDataToSend.append("directorId", formData.directorId);
-  }
+        formDataToSend.append("producerId", String(parseInt(formData.producerId)));
+      }
+      if (formData.directorId) {
+        formDataToSend.append("directorId", String(parseInt(formData.directorId)));
+      }
+
       formDataToSend.append("shortSynopsis", formData.shortSynopsis || "");
       formDataToSend.append("longSynopsis", formData.longSynopsis || "");
       formDataToSend.append("teamComment", formData.teamComment || "");
+
+      console.log("handleSubmit - Données envoyées (FormData) :", Object.fromEntries(formDataToSend.entries()));
 
       const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
         method: "POST",
@@ -58,7 +70,9 @@ const CreateMovie: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur : ${response.status} (${response.statusText})`);
+        const errorData = await response.json();
+        console.error("Erreur retournée par l'API :", errorData);
+        throw new Error(errorData.message || `Erreur : ${response.status}`);
       }
 
       setSuccess(true);
@@ -72,7 +86,9 @@ const CreateMovie: React.FC = () => {
         longSynopsis: "",
         teamComment: "",
       });
+      console.log("Film ajouté avec succès !");
     } catch (error: any) {
+      console.error("Erreur dans handleSubmit :", error.message);
       setError(error.message);
     }
   };
@@ -112,7 +128,6 @@ const CreateMovie: React.FC = () => {
           required
           sx={{ marginBottom: 2 }}
         />
-
         <Typography variant="body1" sx={{ marginBottom: 1 }}>
           Uploader une image :
         </Typography>
