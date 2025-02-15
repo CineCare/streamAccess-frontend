@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent } from "@mui/material";
+import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent, Typography } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const SignupForm: React.FC = () => {
 	const [pseudo, setPseudo] = useState("");
@@ -8,9 +9,17 @@ const SignupForm: React.FC = () => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const navigate = useNavigate();
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		setError(null);
+
+		if (password !== confirmPassword) {
+			setError("Les mots de passe ne correspondent pas.");
+			return;
+		}
 
 		const registrationData = {
 			email,
@@ -28,23 +37,22 @@ const SignupForm: React.FC = () => {
 			});
 
 			if (!response.ok) {
+				// Gestion des erreurs (par exemple, email déjà utilisé)
 				const errorData = await response.json();
-				console.error("Erreur lors de l'inscription:", errorData);
-				alert(`Erreur : ${errorData.message || "Une erreur est survenue lors de l'inscription."}`);
-			} else {
-				const data = await response.json();
-				console.log("Inscription réussie:", data);
-				alert("Inscription réussie !");
+				throw new Error(errorData.message || "Une erreur est survenue lors de l'inscription.");
 			}
-		} catch (error) {
-			console.error("Erreur de réseau:", error);
-			alert("Une erreur de réseau est survenue. Veuillez réessayer.");
+			const data = await response.json();
+			localStorage.setItem('accessToken', data.accessToken);
+			alert("Inscription réussie !");
+			navigate('/movies');
+		} catch (error: any) {
+			setError(error.message);
 		}
 	};
 
-	const togglePasswordVisibility = () => {
-		setShowPassword(!showPassword);
-	};
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
 	return (
 		<Card sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
@@ -100,7 +108,14 @@ const SignupForm: React.FC = () => {
 							/>
 						</Box>
 					</Box>
-
+					{error && (
+					<Typography
+					variant="body2"
+					color="error"
+					sx={{ textAlign: "center" }}>
+					{error}
+					</Typography>
+			)}			
 					{/* Bouton de validation centré */}
 					<Button
 						type="submit"
