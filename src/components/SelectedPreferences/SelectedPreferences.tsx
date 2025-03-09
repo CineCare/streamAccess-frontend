@@ -1,5 +1,7 @@
 import React from "react";
 import { Box, Typography, Button, Chip } from "@mui/material";
+import FormatSizeIcon from "@mui/icons-material/FormatSize";
+import LanguageIcon from '@mui/icons-material/Language';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, setPreference } from "../../providers/store";
 
@@ -18,7 +20,7 @@ const SelectedPreferences: React.FC = () => {
 			simplifiedMode: "Mode Simplifié",
 			audioGuide: "Guide Audio",
 			softMode: "Mode Sensations Douces",
-			language: "Langue",
+			language: "Langue", // Doit rester affiché
 		},
 		auditory: {
 			subtitles: "Sous-titres",
@@ -30,7 +32,7 @@ const SelectedPreferences: React.FC = () => {
 			highContrast: "Mode Contraste Élevé",
 			darkMode: "Mode Sombre",
 			audioDescription: "Audio Description (AD)",
-			fontSize: "Taille de Police",
+			fontSize: "Taille de Police", // Doit rester affiché
 		},
 		cognitive: {
 			dyslexiaSubtitles: "Sous-titres Dyslexie-Friendly",
@@ -45,35 +47,48 @@ const SelectedPreferences: React.FC = () => {
 		},
 	};
 
-	// Récupérer les préférences sélectionnées
 	const getSelectedPreferences = () => {
 		const selectedPreferences: any[] = [];
-		// Parcours des catégories de préférences
+		const fixedPreferences: any[] = [];
+	
 		Object.entries(preferences).forEach(([category, options]) => {
 			Object.entries(options).forEach(([key, value]) => {
 				if (value) {
-					// Utiliser le mapping pour obtenir le label et ajouter l'option sélectionnée
 					const label = preferenceLabels[category]?.[key];
 					if (label) {
-						selectedPreferences.push({ label, category, key });
+						const displayValue = key === "language" || key === "fontSize" ? `${label} : ${value}` : label;
+						const chipData = { 
+							label: displayValue, 
+							category, 
+							key, 
+							removable: !(key === "language" || key === "fontSize"),
+							icon: key === "fontSize" ? <FormatSizeIcon fontSize="small" color="primary" /> : key === "language" ? <LanguageIcon fontSize="small" color="primary" /> : null,
+						};
+	
+						if (key === "language" || key === "fontSize") {
+							fixedPreferences.push(chipData);
+						} else {
+							selectedPreferences.push(chipData);
+						}
 					}
 				}
 			});
 		});
-		return selectedPreferences;
+	
+		return [...fixedPreferences, ...selectedPreferences];
 	};
 
 	const handleResetPreferences = () => {
-		// Réinitialiser toutes les préférences à false
 		Object.keys(preferences).forEach(category => {
 			Object.keys(preferences[category]).forEach(key => {
-				dispatch(setPreference({ category, option: key, value: false }));
+				if (key !== "language" && key !== "fontSize") {
+					dispatch(setPreference({ category, option: key, value: false }));
+				}
 			});
 		});
 	};
 
 	const handleSavePreferences = () => {
-		// Sauvegarder les préférences (exemple : envoyer à une API)
 		console.log("Préférences sauvegardées :", preferences);
 	};
 
@@ -99,15 +114,16 @@ const SelectedPreferences: React.FC = () => {
 				Préférences sélectionnées
 			</Typography>
 
-			{/* Affichage des préférences sélectionnées avec des Chips */}
 			<Box sx={{ marginBottom: 2 }}>
 				{selectedPreferences.length > 0 ? (
 					selectedPreferences.map(pref => (
 						<Chip
 							key={pref.key}
 							label={pref.label}
-							onDelete={() => dispatch(setPreference({ category: pref.category, option: pref.key, value: false }))}
+							icon={pref.icon}
+							onDelete={pref.removable ? () => dispatch(setPreference({ category: pref.category, option: pref.key, value: false })) : undefined}
 							sx={{ margin: 0.5 }}
+							variant={pref.removable ? "outlined" : "filled"}
 						/>
 					))
 				) : (
@@ -119,10 +135,9 @@ const SelectedPreferences: React.FC = () => {
 				)}
 			</Box>
 
-			{/* Boutons pour réinitialiser et sauvegarder */}
 			<Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
 				<Button
-					variant="outlined"
+					variant="contained"
 					color="secondary"
 					onClick={handleResetPreferences}>
 					Vider toutes les préférences
