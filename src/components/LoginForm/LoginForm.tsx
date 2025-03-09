@@ -1,72 +1,115 @@
-// src/components/LoginForm.tsx
-import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, CircularProgress } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { login } from '../../providers/store';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent, Typography } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const LoginForm: React.FC = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+	const [formData, setFormData] = useState({ email: "", password: "" });
+	const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+	const [showPassword, setShowPassword] = useState(false);
+	const [serverMessage, setServerMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+	const validateForm = () => {
+		let valid = true;
+		let newErrors: { email?: string; password?: string } = {};
 
-    try {
-      const response = await fetch('https://streamaccess-dev-backend.codevert.org/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+		if (!formData.email) {
+			newErrors.email = "L'email est requis.";
+			valid = false;
+		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+			newErrors.email = "Format d'email invalide.";
+			valid = false;
+		}
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Une erreur est survenue lors de la connexion.');
-      }
+		if (!formData.password) {
+			newErrors.password = "Le mot de passe est requis.";
+			valid = false;
+		}
 
-      const data = await response.json();
-      localStorage.setItem('accessToken', data.accessToken);
-      dispatch(login(data.user));
-      navigate('/movies');
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+		setErrors(newErrors);
+		return valid;
+	};
 
-  return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Typography variant="h5">Connexion</Typography>
-      <TextField
-        label="Email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <TextField
-        label="Mot de passe"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      {error && <Typography variant="body2" color="error" textAlign="center">{error}</Typography>}
-      <Button type="submit" variant="contained" color="primary" disabled={loading}>
-        {loading ? <CircularProgress size={24} color="inherit" /> : "Se connecter"}
-      </Button>
-    </Box>
-  );
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setServerMessage(null);
+
+		if (!validateForm()) return;
+
+		try {
+			const response = await fetch("https://streamaccess-dev-backend.codevert.org/auth/login", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(formData),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || "Erreur lors de la connexion.");
+			}
+
+			setServerMessage("Connexion réussie ! Vous allez être redirigé.");
+			setTimeout(() => (window.location.href = "/movies"), 2000); // Simule une redirection
+		} catch (error: any) {
+			setServerMessage(error.message);
+		}
+	};
+
+	return (
+		<Card sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
+			<CardContent>
+				<Box
+					component="form"
+					onSubmit={handleSubmit}
+					sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, marginTop: 4 }}>
+					<TextField
+						label="Email"
+						type="email"
+						fullWidth
+						value={formData.email}
+						onChange={e => setFormData({ ...formData, email: e.target.value })}
+						error={!!errors.email}
+						helperText={errors.email}
+						required
+					/>
+					<TextField
+						label="Mot de passe"
+						type={showPassword ? "text" : "password"}
+						fullWidth
+						value={formData.password}
+						onChange={e => setFormData({ ...formData, password: e.target.value })}
+						error={!!errors.password}
+						helperText={errors.password}
+						required
+						InputProps={{
+							endAdornment: (
+								<InputAdornment position="end">
+									<IconButton
+										onClick={() => setShowPassword(!showPassword)}
+										edge="end">
+										{showPassword ? <VisibilityOff /> : <Visibility />}
+									</IconButton>
+								</InputAdornment>
+							),
+						}}
+					/>
+					{serverMessage && (
+						<Typography
+							variant="body2"
+							color={serverMessage.includes("succès") ? "success.main" : "error"}>
+							{serverMessage}
+						</Typography>
+					)}
+					<Button
+						type="submit"
+						variant="contained"
+						color="primary"
+						sx={{ marginTop: 2 }}>
+						Se connecter
+					</Button>
+				</Box>
+			</CardContent>
+		</Card>
+	);
 };
 
 export default LoginForm;

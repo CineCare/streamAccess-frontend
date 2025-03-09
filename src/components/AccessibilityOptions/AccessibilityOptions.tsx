@@ -1,224 +1,137 @@
+import { useDispatch, useSelector } from "react-redux";
+import { Container, Box, Typography, Tabs, Tab, FormGroup, FormControlLabel, Checkbox, Select, MenuItem, Slider, Card, CardContent } from "@mui/material";
 import { useState } from "react";
-import {
-  Container,
-  Box,
-  Typography,
-  Tabs,
-  Tab,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Select,
-  MenuItem,
-  Button,
-  Slider,
-  Card,
-  CardContent,
-} from "@mui/material";
+import { SelectChangeEvent } from "@mui/material/Select";
+import { RootState, setPreference } from "../../providers/store";
+
+// Configuration centralisée des options (mapping externe)
+const accessibilityOptions = {
+	general: [
+		{ key: "simplifiedMode", label: "Mode Accessibilité Simplifié - Active des options adaptées pour un usage facilité." },
+		{ key: "audioGuide", label: "Guide Audio Simplifié - Fournit des instructions vocales pour la navigation." },
+		{ key: "softMode", label: "Mode Sensations Douces - Réduit les animations et ajuste les couleurs pour un effet apaisant." },
+	],
+	auditory: [
+		{ key: "subtitles", label: "Sous-titres Activables - Permet d'afficher des sous-titres pour les dialogues et les sons." },
+		{ key: "dialogAmplification", label: "Amplification des Dialogues - Renforce les voix dans les contenus audio." },
+		{ key: "hearingAid", label: "Compatibilité avec Appareils Auditifs - Ajuste le son pour les appareils compatibles." },
+		{ key: "visualAlerts", label: "Notifications Visuelles - Remplace les alertes sonores par des signaux visuels." },
+	],
+	visual: [
+		{ key: "highContrast", label: "Mode Contraste Élevé - Améliore la visibilité des textes et des éléments." },
+		{ key: "darkMode", label: "Mode Sombre - Réduit la luminosité de l'interface." },
+		{ key: "audioDescription", label: "Audio Description (AD) - Active les descriptions vocales pour les éléments visuels." },
+	],
+	cognitive: [
+		{ key: "dyslexiaSubtitles", label: "Sous-titres Dyslexie-Friendly - Utilise des polices adaptées aux personnes dyslexiques." },
+		{ key: "pauseMode", label: "Mode de Visionnage avec Pauses Automatiques - Ajoute des pauses dans les contenus pour permettre une meilleure assimilation." },
+		{ key: "distractionFree", label: "Interface Sans Distraction - Affiche uniquement les éléments essentiels." },
+		{ key: "contentSummary", label: "Résumé de Contenu Avant Lecture - Fournit un résumé rapide des contenus avant le visionnage." },
+	],
+	psychical: [
+		{ key: "filterAnxiety", label: "Filtrage des Contenus Anxiogènes - Masque ou avertit pour les contenus potentiellement stressants." },
+		{ key: "guidedNavigation", label: "Navigation Guidée - Simplifie la navigation avec des indications étape par étape." },
+		{ key: "calmAmbiance", label: "Ambiances Apaisantes - Ajuste les effets sonores et visuels pour réduire le stress." },
+	],
+};
+
+const tabTitles = ["Général", "Paramètres Sensoriels - Auditif", "Paramètres Sensoriels - Visuel", "Paramètres Cognitifs", "Paramètres Psychiques"];
 
 const AccessibilityOptions: React.FC = () => {
-  const [accessibilityTab, setAccessibilityTab] = useState(0);
-  const [fontSize, setFontSize] = useState(14); // Taille de police personnalisable
-  const [language, setLanguage] = useState(""); // Langue sélectionnée
+	const dispatch = useDispatch();
+	const preferences = useSelector((state: RootState) => state.accessibility.preferences);
+	const [accessibilityTab, setAccessibilityTab] = useState(0);
+	const [fontSize, setFontSize] = useState<number>(typeof preferences.visual?.fontSize === "number" ? preferences.visual.fontSize : 14);
+	const [language, setLanguage] = useState<string>(typeof preferences.general?.language === "string" ? preferences.general.language : "fr");
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setAccessibilityTab(newValue);
-  };
+	const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+		setAccessibilityTab(newValue);
+	};
 
-  const handleFontSizeChange = (_event: Event, newValue: number | number[]) => {
-    if (typeof newValue === "number") {
-      setFontSize(newValue); // Pour un slider simple
-    } else {
-      console.error("Slider returned a range, but only a single value is supported.");
-    }
-  };
+	const handlePreferenceChange = (category: string, option: string, value: unknown) => {
+		dispatch(setPreference({ category, option, value: value as boolean }));
+	};
 
-  return (
-    <Container maxWidth="lg">
-      {/* Onglets */}
-      <Tabs
-        value={accessibilityTab}
-        onChange={handleTabChange}
-        textColor="primary"
-        indicatorColor="primary"
-        variant="scrollable"
-        scrollButtons="auto"
-      >
-        <Tab label="Général" />
-        <Tab label="Paramètres Sensoriels - Auditif" />
-        <Tab label="Paramètres Sensoriels - Visuel" />
-        <Tab label="Paramètres Cognitifs" />
-        <Tab label="Paramètres Psychiques" />
-      </Tabs>
+	const handleLanguageChange = (event: SelectChangeEvent<string>) => {
+		const newLanguage = event.target.value as string;
+		setLanguage(newLanguage); // Mettre à jour la langue localement
+		dispatch(setPreference({ category: "general", option: "language", value: newLanguage })); // Et dans le store
+	};
 
-      <Box marginTop={2}>
-        {/* Contenu des onglets */}
-        {accessibilityTab === 0 && (
-          <Card sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
-            <CardContent>
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Mode Accessibilité Simplifié - Active des options adaptées pour un usage facilité."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Guide Audio Simplifié - Fournit des instructions vocales pour la navigation."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Mode Sensations Douces - Réduit les animations et ajuste les couleurs pour un effet apaisant."
-                />
-                <Box marginBottom={2}>
-                  <Typography variant="body1">Choix de Langue</Typography>
-                  <Select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                    fullWidth
-                  >
-                    <MenuItem value="fr">Français</MenuItem>
-                    <MenuItem value="en">Anglais</MenuItem>
-                    <MenuItem value="es">Espagnol</MenuItem>
-                  </Select>
-                </Box>
-              </FormGroup>
-            </CardContent>
-          </Card>
-        )}
+	return (
+		<Container maxWidth="lg">
+			<Tabs
+				value={accessibilityTab}
+				onChange={handleTabChange}
+				textColor="primary"
+				indicatorColor="primary"
+				variant="scrollable"
+				scrollButtons="auto">
+				{tabTitles.map((title, index) => (
+					<Tab
+						label={title}
+						key={index}
+					/>
+				))}
+			</Tabs>
 
-        {/* Tab Auditif */}
-        {accessibilityTab === 1 && (
-          <Card sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Paramètres Sensoriels - Auditif
-              </Typography>
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Sous-titres Activables - Permet d'afficher des sous-titres pour les dialogues et les sons."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Amplification des Dialogues - Renforce les voix dans les contenus audio."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Compatibilité avec Appareils Auditifs - Ajuste le son pour les appareils compatibles."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Notifications Visuelles - Remplace les alertes sonores par des signaux visuels."
-                />
-              </FormGroup>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Tab Visuel */}
-        {accessibilityTab === 2 && (
-          <Card sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Paramètres Sensoriels - Visuel
-              </Typography>
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Mode Contraste Élevé - Améliore la visibilité des textes et des éléments."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Mode Sombre - Réduit la luminosité de l'interface."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Audio Description (AD) - Active les descriptions vocales pour les éléments visuels."
-                />
-                <Box marginBottom={2}>
-                  <Typography variant="body1">
-                    Personnalisation de la Taille de la Police
-                  </Typography>
-                  <Slider
-                    value={fontSize}
-                    onChange={handleFontSizeChange}
-                    min={12}
-                    max={24}
-                    step={1}
-                    valueLabelDisplay="auto"
-                  />
-                </Box>
-              </FormGroup>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Tab Cognitif */}
-        {accessibilityTab === 3 && (
-          <Card sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Paramètres Cognitifs
-              </Typography>
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Sous-titres Dyslexie-Friendly - Utilise des polices adaptées aux personnes dyslexiques."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Mode de Visionnage avec Pauses Automatiques - Ajoute des pauses dans les contenus pour permettre une meilleure assimilation."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Interface Sans Distraction - Affiche uniquement les éléments essentiels."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Résumé de Contenu Avant Lecture - Fournit un résumé rapide des contenus avant le visionnage."
-                />
-              </FormGroup>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Tab Psychique */}
-        {accessibilityTab === 4 && (
-          <Card sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Paramètres Psychiques
-              </Typography>
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Filtrage des Contenus Anxiogènes - Masque ou avertit pour les contenus potentiellement stressants."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Navigation Guidée - Simplifie la navigation avec des indications étape par étape."
-                />
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label="Ambiances Apaisantes - Ajuste les effets sonores et visuels pour réduire le stress."
-                />
-              </FormGroup>
-            </CardContent>
-          </Card>
-        )}
-      </Box>
-
-      {/* Boutons */}
-      <Box marginTop={4} display="flex" justifyContent="space-between">
-        <Button variant="outlined" color="secondary">
-          Tester mes paramètres
-        </Button>
-        <Button variant="contained" color="primary">
-          Sauvegarder mes préférences
-        </Button>
-      </Box>
-    </Container>
-  );
+			<Box marginTop={2}>
+				{Object.entries(accessibilityOptions).map(
+					([category, options], index) =>
+						accessibilityTab === index && (
+							<Card
+								key={category}
+								sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
+								<CardContent>
+									<Typography
+										variant="h5"
+										gutterBottom>
+										{tabTitles[index]} {/* Affiche le titre de l'onglet correspondant */}
+									</Typography>
+									<FormGroup>
+										{options.map(({ key, label }) => (
+											<FormControlLabel
+												key={key}
+												control={
+													<Checkbox
+														checked={Boolean(preferences[category]?.[key])} // S'assurer que la valeur est bien un boolean
+														onChange={e => handlePreferenceChange(category, key, e.target.checked)}
+													/>
+												}
+												label={label}
+											/>
+										))}
+										{category === "visual" && (
+											<Box marginBottom={2}>
+												<Typography variant="body1">Taille de la police</Typography>
+												<Slider
+													value={fontSize}
+													onChange={(_e, value) => setFontSize(value as number)}
+													onChangeCommitted={(_e, value) => dispatch(setPreference({ category: "visual", option: "fontSize", value: Array.isArray(value) ? value[0] : value }))}
+													min={12}
+													max={24}
+												/>
+											</Box>
+										)}
+										{category === "general" && (
+											<Box marginBottom={2}>
+												<Typography variant="body1">Langue</Typography>
+												<Select
+													value={language}
+													onChange={handleLanguageChange}>
+													<MenuItem value="fr">Français</MenuItem>
+													<MenuItem value="en">Anglais</MenuItem>
+												</Select>
+											</Box>
+										)}
+									</FormGroup>
+								</CardContent>
+							</Card>
+						)
+				)}
+			</Box>
+		</Container>
+	);
 };
 
 export default AccessibilityOptions;

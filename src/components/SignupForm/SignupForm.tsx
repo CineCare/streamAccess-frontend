@@ -1,58 +1,66 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent, Typography } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 
 const SignupForm: React.FC = () => {
-	const [pseudo, setPseudo] = useState("");
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
+	const [formData, setFormData] = useState({
+		pseudo: "",
+		email: "",
+		password: "",
+		confirmPassword: "",
+	});
 	const [showPassword, setShowPassword] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const navigate = useNavigate();
+	const [error, setError] = useState<Record<string, string>>({});
+	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setFormData(prev => ({ ...prev, [name]: value }));
+		setError(prev => ({ ...prev, [name]: "" })); // Efface les erreurs du champ en cours de modification
+	};
+
+	const validateForm = () => {
+		let newErrors: Record<string, string> = {};
+
+		if (!formData.pseudo.trim()) newErrors.pseudo = "Le pseudo est requis.";
+		if (!formData.email.match(/^\S+@\S+\.\S+$/)) newErrors.email = "L'email n'est pas valide.";
+		if (formData.password.length < 8) newErrors.password = "Le mot de passe doit contenir au moins 8 caractères.";
+		if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Les mots de passe ne correspondent pas.";
+
+		setError(newErrors);
+		return Object.keys(newErrors).length === 0;
+	};
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		setError(null);
+		setSuccessMessage(null);
+		if (!validateForm()) return;
 
-		if (password !== confirmPassword) {
-			setError("Les mots de passe ne correspondent pas.");
-			return;
-		}
-
-		const registrationData = {
-			email,
-			pseudo,
-			password,
-		};
+		const { pseudo, email, password } = formData;
+		const registrationData = { pseudo, email, password };
 
 		try {
 			const response = await fetch("https://streamaccess-dev-backend.codevert.org/auth/register", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(registrationData),
 			});
 
 			if (!response.ok) {
-				// Gestion des erreurs (par exemple, email déjà utilisé)
 				const errorData = await response.json();
 				throw new Error(errorData.message || "Une erreur est survenue lors de l'inscription.");
 			}
-			const data = await response.json();
-			localStorage.setItem('accessToken', data.accessToken);
-			alert("Inscription réussie !");
-			navigate('/movies');
+
+			setSuccessMessage("Votre demande a été envoyée avec succès et sera traitée par un administrateur.");
+			setFormData({ pseudo: "", email: "", password: "", confirmPassword: "" });
 		} catch (error: any) {
-			setError(error.message);
+			setError({ global: error.message });
 		}
 	};
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+	const togglePasswordVisibility = () => {
+		setShowPassword(!showPassword);
+	};
 
 	return (
 		<Card sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
@@ -61,62 +69,78 @@ const SignupForm: React.FC = () => {
 					component="form"
 					onSubmit={handleSubmit}
 					sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, marginTop: 4 }}>
-					{/* Conteneur principal en deux colonnes */}
-					<Box sx={{ display: "flex", gap: 4, width: "100%", maxWidth: "80vw" }}>
-						{/* Section de gauche - Champs de formulaire */}
-						<Box sx={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
-							<TextField
-								label="Pseudo"
-								fullWidth
-								value={pseudo}
-								onChange={e => setPseudo(e.target.value)}
-								required
-							/>
-							<TextField
-								label="Email"
-								type="email"
-								value={email}
-								onChange={e => setEmail(e.target.value)}
-								required
-							/>
-							<TextField
-								label="Mot de passe"
-								type={showPassword ? "text" : "password"}
-								fullWidth
-								value={password}
-								onChange={e => setPassword(e.target.value)}
-								required
-								InputProps={{
-									endAdornment: (
-										<InputAdornment position="end">
-											<IconButton
-												onClick={togglePasswordVisibility}
-												edge="end">
-												{showPassword ? <VisibilityOff /> : <Visibility />}
-											</IconButton>
-										</InputAdornment>
-									),
-								}}
-							/>
-							<TextField
-								label="Confirmer le mot de passe"
-								type="password"
-								fullWidth
-								value={confirmPassword}
-								onChange={e => setConfirmPassword(e.target.value)}
-								required
-							/>
-						</Box>
-					</Box>
-					{error && (
-					<Typography
-					variant="body2"
-					color="error"
-					sx={{ textAlign: "center" }}>
-					{error}
-					</Typography>
-			)}			
-					{/* Bouton de validation centré */}
+					<TextField
+						label="Pseudo"
+						name="pseudo"
+						fullWidth
+						value={formData.pseudo}
+						onChange={handleChange}
+						error={!!error.pseudo}
+						helperText={error.pseudo}
+						required
+					/>
+					<TextField
+						label="Email"
+						name="email"
+						type="email"
+						fullWidth
+						value={formData.email}
+						onChange={handleChange}
+						error={!!error.email}
+						helperText={error.email}
+						required
+					/>
+					<TextField
+						label="Mot de passe"
+						name="password"
+						type={showPassword ? "text" : "password"}
+						fullWidth
+						value={formData.password}
+						onChange={handleChange}
+						error={!!error.password}
+						helperText={error.password}
+						required
+						InputProps={{
+							endAdornment: (
+								<InputAdornment position="end">
+									<IconButton
+										onClick={togglePasswordVisibility}
+										edge="end">
+										{showPassword ? <VisibilityOff /> : <Visibility />}
+									</IconButton>
+								</InputAdornment>
+							),
+						}}
+					/>
+					<TextField
+						label="Confirmer le mot de passe"
+						name="confirmPassword"
+						type="password"
+						fullWidth
+						value={formData.confirmPassword}
+						onChange={handleChange}
+						error={!!error.confirmPassword}
+						helperText={error.confirmPassword}
+						required
+					/>
+
+					{error.global && (
+						<Typography
+							variant="body2"
+							color="error"
+							sx={{ textAlign: "center" }}>
+							{error.global}
+						</Typography>
+					)}
+					{successMessage && (
+						<Typography
+							variant="body2"
+							color="success.main"
+							sx={{ textAlign: "center" }}>
+							{successMessage}
+						</Typography>
+					)}
+
 					<Button
 						type="submit"
 						variant="contained"
