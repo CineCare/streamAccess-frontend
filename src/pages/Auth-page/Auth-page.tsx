@@ -5,6 +5,7 @@ import SignupForm from "../../components/SignupForm/SignupForm";
 import Logo from "../../assets/logo.svg";
 import AccessibilityOptions from "../../components/AccessibilityOptions/AccessibilityOptions";
 import SelectedPreferences from "../../components/SelectedPreferences/SelectedPreferences";
+import EcoStats from "../../components/EcoStats/EcoStats";
 
 const AuthPage: React.FC = () => {
 	const theme = useTheme();
@@ -23,11 +24,11 @@ const AuthPage: React.FC = () => {
 					top: 16, // Ajuster la distance du haut
 					left: 16, // Ajuster la distance de la gauche
 					zIndex: 1000, // Assurer que le composant reste au-dessus du contenu
-					width: "100%", // Ajuster la largeur
+					width: "99%", // Ajuster la largeur
 				}}>
 				<SelectedPreferences />
 			</Box>
-
+			<EcoStats />
 			<Box
 				component="figure"
 				sx={{ display: "inline-block" }}>
