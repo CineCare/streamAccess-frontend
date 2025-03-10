@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent, Typography } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent, Typography, Fab } from "@mui/material";
+import { Visibility, VisibilityOff, Mic } from "@mui/icons-material";
 
 const SignupForm: React.FC = () => {
 	const [formData, setFormData] = useState({
@@ -65,6 +65,9 @@ const SignupForm: React.FC = () => {
 	return (
 		<Card sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
 			<CardContent>
+			<Fab color="primary" aria-label="add">
+				<Mic sx={{ fontSize: 40 }} />
+			</Fab>
 				<Box
 					component="form"
 					onSubmit={handleSubmit}
