@@ -1,11 +1,17 @@
 import React, { useState } from "react";
-import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent, Typography } from "@mui/material";
+import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent, Typography,CircularProgress } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useDispatch } from 'react-redux';
+import { login } from '../../providers/store';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm: React.FC = () => {
+	const dispatch = useDispatch();
+  const navigate = useNavigate();
 	const [formData, setFormData] = useState({ email: "", password: "" });
 	const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 	const [showPassword, setShowPassword] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const [serverMessage, setServerMessage] = useState<string | null>(null);
 
 	const validateForm = () => {
@@ -32,7 +38,7 @@ const LoginForm: React.FC = () => {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setServerMessage(null);
-
+		setLoading(true);
 		if (!validateForm()) return;
 
 		try {
@@ -46,12 +52,16 @@ const LoginForm: React.FC = () => {
 				const errorData = await response.json();
 				throw new Error(errorData.message || "Erreur lors de la connexion.");
 			}
-
+			const data = await response.json();
+      localStorage.setItem('accessToken', data.accessToken);
+      dispatch(login(data.user));
 			setServerMessage("Connexion réussie ! Vous allez être redirigé.");
-			setTimeout(() => (window.location.href = "/movies"), 2000); // Simule une redirection
+			navigate("/movies");
 		} catch (error: any) {
 			setServerMessage(error.message);
-		}
+		}finally {
+      setLoading(false);
+    }
 	};
 
 	return (
@@ -95,7 +105,7 @@ const LoginForm: React.FC = () => {
 					{serverMessage && (
 						<Typography
 							variant="body2"
-							color={serverMessage.includes("succès") ? "success.main" : "error"}>
+							color={serverMessage.includes("réussie") ? "success.main" : "error"}>
 							{serverMessage}
 						</Typography>
 					)}
@@ -103,8 +113,9 @@ const LoginForm: React.FC = () => {
 						type="submit"
 						variant="contained"
 						color="primary"
+						disabled={loading}
 						sx={{ marginTop: 2 }}>
-						Se connecter
+						{loading ? <CircularProgress size={24} color="inherit" /> : "Se connecter"}
 					</Button>
 				</Box>
 			</CardContent>
