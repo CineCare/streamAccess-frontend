@@ -1,26 +1,27 @@
 import React from "react";
-import { Box, Typography, Button, Chip } from "@mui/material";
+import { Box, Typography, Button, Chip, useTheme } from "@mui/material";
 import FormatSizeIcon from "@mui/icons-material/FormatSize";
-import LanguageIcon from '@mui/icons-material/Language';
+import LanguageIcon from "@mui/icons-material/Language";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, setPreference } from "../../providers/store";
+import { RootState, setPreference, selectCategoryColors } from "../../providers/store";
 
 const SelectedPreferences: React.FC = () => {
 	const dispatch = useDispatch();
 	const preferences = useSelector((state: RootState) => state.accessibility.preferences);
+	const categoryColors = useSelector(selectCategoryColors);
+	const theme = useTheme(); // Récupère le thème MUI
 
-	type PreferenceLabels = {
-		[category: string]: {
+	// Labels des préférences
+	const preferenceLabels: {
+		[key: string]: {
 			[key: string]: string;
 		};
-	};
-
-	const preferenceLabels: PreferenceLabels = {
+	} = {
 		general: {
 			simplifiedMode: "Mode Simplifié",
 			audioGuide: "Guide Audio",
 			softMode: "Mode Sensations Douces",
-			language: "Langue", // Doit rester affiché
+			language: "Langue", // Toujours affiché
 		},
 		auditory: {
 			subtitles: "Sous-titres",
@@ -32,7 +33,7 @@ const SelectedPreferences: React.FC = () => {
 			highContrast: "Mode Contraste Élevé",
 			darkMode: "Mode Sombre",
 			audioDescription: "Audio Description (AD)",
-			fontSize: "Taille de Police", // Doit rester affiché
+			fontSize: "Taille de Police", // Toujours affiché
 		},
 		cognitive: {
 			dyslexiaSubtitles: "Sous-titres Dyslexie-Friendly",
@@ -47,24 +48,36 @@ const SelectedPreferences: React.FC = () => {
 		},
 	};
 
+	// Récupère les préférences activées
 	const getSelectedPreferences = () => {
 		const selectedPreferences: any[] = [];
 		const fixedPreferences: any[] = [];
-	
+
 		Object.entries(preferences).forEach(([category, options]) => {
 			Object.entries(options).forEach(([key, value]) => {
 				if (value) {
-					const label = preferenceLabels[category]?.[key];
+					const label = preferenceLabels[category as keyof typeof preferenceLabels]?.[key];
 					if (label) {
 						const displayValue = key === "language" || key === "fontSize" ? `${label} : ${value}` : label;
-						const chipData = { 
-							label: displayValue, 
-							category, 
-							key, 
+						const chipData = {
+							label: displayValue,
+							category,
+							key,
 							removable: !(key === "language" || key === "fontSize"),
-							icon: key === "fontSize" ? <FormatSizeIcon fontSize="small" color="primary" /> : key === "language" ? <LanguageIcon fontSize="small" color="primary" /> : null,
+							icon:
+								key === "fontSize" ? (
+									<FormatSizeIcon
+										color="inherit"
+										fontSize="small"
+									/>
+								) : key === "language" ? (
+									<LanguageIcon
+										color="inherit"
+										fontSize="small"
+									/>
+								) : null,
 						};
-	
+
 						if (key === "language" || key === "fontSize") {
 							fixedPreferences.push(chipData);
 						} else {
@@ -74,10 +87,11 @@ const SelectedPreferences: React.FC = () => {
 				}
 			});
 		});
-	
+
 		return [...fixedPreferences, ...selectedPreferences];
 	};
 
+	// Réinitialisation des préférences
 	const handleResetPreferences = () => {
 		Object.keys(preferences).forEach(category => {
 			Object.keys(preferences[category]).forEach(key => {
@@ -88,10 +102,12 @@ const SelectedPreferences: React.FC = () => {
 		});
 	};
 
+	// Sauvegarde des préférences (exemple : API)
 	const handleSavePreferences = () => {
 		console.log("Préférences sauvegardées :", preferences);
 	};
 
+	// Récupère les préférences sélectionnées
 	const selectedPreferences = getSelectedPreferences();
 
 	return (
@@ -102,11 +118,11 @@ const SelectedPreferences: React.FC = () => {
 				left: 16,
 				zIndex: 1000,
 				padding: 2,
-				backgroundColor: theme => theme.palette.background.paper,
+				backgroundColor: theme.palette.background.paper,
 				borderRadius: 2,
 				boxShadow: 3,
 				width: "auto",
-				maxWidth: "35%",
+				maxWidth: "37%",
 			}}>
 			<Typography
 				variant="h6"
@@ -114,18 +130,34 @@ const SelectedPreferences: React.FC = () => {
 				Préférences sélectionnées
 			</Typography>
 
+			{/* Affichage des préférences activées */}
 			<Box sx={{ marginBottom: 2 }}>
 				{selectedPreferences.length > 0 ? (
-					selectedPreferences.map(pref => (
-						<Chip
-							key={pref.key}
-							label={pref.label}
-							icon={pref.icon}
-							onDelete={pref.removable ? () => dispatch(setPreference({ category: pref.category, option: pref.key, value: false })) : undefined}
-							sx={{ margin: 0.5 }}
-							variant={pref.removable ? "outlined" : "filled"}
-						/>
-					))
+					selectedPreferences.map(pref => {
+						// Récupérer la couleur de la catégorie depuis le thème
+						const colorKey = categoryColors[pref.category];
+						const paletteColor = theme.palette[colorKey as keyof typeof theme.palette];
+
+						// Vérifier que la couleur est bien un objet avec `.main`
+						const chipColor = typeof paletteColor === "object" && "main" in paletteColor ? paletteColor.main : (paletteColor as string);
+						const chipTextColor = typeof paletteColor === "object" && "contrastText" in paletteColor ? paletteColor.contrastText : "#FFF";
+
+						return (
+							<Chip
+								key={pref.key}
+								label={pref.label}
+								icon={pref.icon || undefined}
+								onDelete={pref.removable ? () => dispatch(setPreference({ category: pref.category, option: pref.key, value: false })) : undefined}
+								variant={pref.removable ? "outlined" : "filled"}
+								sx={{
+									margin: 0.5,
+									...(pref.removable
+										? { borderColor: chipColor, color: chipColor } // Pour "outlined"
+										: { backgroundColor: chipColor, color: chipTextColor }), // Pour "filled"
+								}}
+							/>
+						);
+					})
 				) : (
 					<Typography
 						variant="body2"
@@ -135,6 +167,7 @@ const SelectedPreferences: React.FC = () => {
 				)}
 			</Box>
 
+			{/* Boutons de gestion des préférences */}
 			<Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
 				<Button
 					variant="contained"

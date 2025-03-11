@@ -2,7 +2,7 @@
 import { createContext, useContext } from "react";
 
 // Types pour les thèmes
-type ThemeType = "default" | "highContrast" | "largeText";
+type ThemeType = "default" | "highContrast" | "soft" | "lightTheme" | "largeText";
 
 interface ThemeContextProps {
 	theme: ThemeType;
