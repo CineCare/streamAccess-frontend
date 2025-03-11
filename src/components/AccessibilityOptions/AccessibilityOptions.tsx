@@ -2,9 +2,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Box, Typography, Tabs, Tab, FormGroup, FormControlLabel, Checkbox, Select, MenuItem, Slider, Card, CardContent } from "@mui/material";
 import { useState } from "react";
 import { SelectChangeEvent } from "@mui/material/Select";
-import { RootState, setPreference } from "../../providers/store";
+import { RootState, setPreference, selectCategoryColors } from "../../providers/store";
+import { useTheme, PaletteColor } from "@mui/material/styles";
 
-// Configuration centralisée des options (mapping externe)
+// Configuration des options d'accessibilité
 const accessibilityOptions = {
 	general: [
 		{ key: "simplifiedMode", label: "Mode Accessibilité Simplifié - Active des options adaptées pour un usage facilité." },
@@ -35,99 +36,148 @@ const accessibilityOptions = {
 	],
 };
 
+// Titres des onglets
 const tabTitles = ["Général", "Paramètres Sensoriels - Auditif", "Paramètres Sensoriels - Visuel", "Paramètres Cognitifs", "Paramètres Psychiques"];
 
 const AccessibilityOptions: React.FC = () => {
 	const dispatch = useDispatch();
 	const preferences = useSelector((state: RootState) => state.accessibility.preferences);
+	const categoryColors = useSelector(selectCategoryColors);
+	const theme = useTheme();
+
 	const [accessibilityTab, setAccessibilityTab] = useState(0);
 	const [fontSize, setFontSize] = useState<number>(typeof preferences.visual?.fontSize === "number" ? preferences.visual.fontSize : 14);
 	const [language, setLanguage] = useState<string>(typeof preferences.general?.language === "string" ? preferences.general.language : "fr");
 
+	// Changement d'onglet
 	const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
 		setAccessibilityTab(newValue);
 	};
 
+	// Changement d'option
 	const handlePreferenceChange = (category: string, option: string, value: unknown) => {
-		dispatch(setPreference({ category, option, value: value as boolean }));
+		dispatch(setPreference({ category, option, value: value as string | number | boolean }));
 	};
 
+	// Changement de langue
 	const handleLanguageChange = (event: SelectChangeEvent<string>) => {
 		const newLanguage = event.target.value as string;
-		setLanguage(newLanguage); // Mettre à jour la langue localement
-		dispatch(setPreference({ category: "general", option: "language", value: newLanguage })); // Et dans le store
+		setLanguage(newLanguage);
+		dispatch(setPreference({ category: "general", option: "language", value: newLanguage }));
 	};
 
 	return (
 		<Container maxWidth="lg">
+			{/* Onglets avec couleur dynamique */}
 			<Tabs
 				value={accessibilityTab}
 				onChange={handleTabChange}
-				textColor="primary"
-				indicatorColor="primary"
+				textColor="inherit"
 				variant="scrollable"
-				scrollButtons="auto">
+				scrollButtons="auto"
+				sx={{
+					"& .MuiTabs-indicator": {
+						backgroundColor: (theme.palette[categoryColors[Object.keys(accessibilityOptions)[accessibilityTab]]] as PaletteColor)?.main, // Couleur sous l'onglet actif
+					},
+					"& .MuiTab-root.Mui-selected": {
+						color: (theme.palette[categoryColors[Object.keys(accessibilityOptions)[accessibilityTab]]] as PaletteColor)?.main, // Texte de l'onglet actif
+					},
+				}}>
 				{tabTitles.map((title, index) => (
 					<Tab
-						label={title}
 						key={index}
+						label={title}
 					/>
 				))}
 			</Tabs>
 
 			<Box marginTop={2}>
-				{Object.entries(accessibilityOptions).map(
-					([category, options], index) =>
-						accessibilityTab === index && (
-							<Card
-								key={category}
-								sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
-								<CardContent>
-									<Typography
-										variant="h5"
-										gutterBottom>
-										{tabTitles[index]} {/* Affiche le titre de l'onglet correspondant */}
-									</Typography>
-									<FormGroup>
-										{options.map(({ key, label }) => (
+				{Object.entries(accessibilityOptions).map(([category, options], index) =>
+					accessibilityTab === index ? (
+						<Card
+							key={category}
+							sx={{ mb: 3, "&:hover": { boxShadow: 3 } }}>
+							<CardContent>
+								<Typography
+									variant="h5"
+									gutterBottom>
+									{tabTitles[index]} {/* Affiche le titre correspondant */}
+								</Typography>
+								<FormGroup>
+									{options.map(({ key, label }) => {
+										// Récupérer la couleur de la catégorie depuis le thème
+										const colorKey = categoryColors[category]; // Ex: "primary", "success", etc.
+										const paletteColor = theme.palette[colorKey as keyof typeof theme.palette];
+
+										// Vérifier que la couleur a bien une propriété "main"
+										const checkboxColor = typeof paletteColor === "object" && "main" in paletteColor ? paletteColor.main : String(paletteColor);
+
+										return (
 											<FormControlLabel
 												key={key}
 												control={
 													<Checkbox
-														checked={Boolean(preferences[category]?.[key])} // S'assurer que la valeur est bien un boolean
+														checked={Boolean(preferences[category]?.[key])}
 														onChange={e => handlePreferenceChange(category, key, e.target.checked)}
+														sx={{
+															color: checkboxColor,
+															"&.Mui-checked": {
+																color: checkboxColor,
+															},
+														}}
 													/>
 												}
 												label={label}
 											/>
-										))}
-										{category === "visual" && (
-											<Box marginBottom={2}>
-												<Typography variant="body1">Taille de la police</Typography>
-												<Slider
-													value={fontSize}
-													onChange={(_e, value) => setFontSize(value as number)}
-													onChangeCommitted={(_e, value) => dispatch(setPreference({ category: "visual", option: "fontSize", value: Array.isArray(value) ? value[0] : value }))}
-													min={12}
-													max={24}
-												/>
-											</Box>
-										)}
-										{category === "general" && (
-											<Box marginBottom={2}>
-												<Typography variant="body1">Langue</Typography>
-												<Select
-													value={language}
-													onChange={handleLanguageChange}>
-													<MenuItem value="fr">Français</MenuItem>
-													<MenuItem value="en">Anglais</MenuItem>
-												</Select>
-											</Box>
-										)}
-									</FormGroup>
-								</CardContent>
-							</Card>
-						)
+										);
+									})}
+									{category === "visual" && (
+										<Box marginTop={2}>
+											<Typography variant="body1">Taille de la police</Typography>
+											<Slider
+												value={fontSize}
+												onChange={(_e, value) => setFontSize(value as number)}
+												onChangeCommitted={(_e, value) => {
+													if (typeof value === "number") {
+														dispatch(setPreference({ category: "visual", option: "fontSize", value }));
+													}
+												}}
+												min={12}
+												max={24}
+												valueLabelDisplay="auto"
+												sx={{
+													color: (theme.palette[categoryColors["visual"]] as PaletteColor).main, // ✅ Applique la couleur dynamique
+													"& .MuiSlider-thumb": {
+														backgroundColor: (theme.palette[categoryColors["visual"]] as PaletteColor).main, // ✅ Change la couleur du curseur
+													},
+													"& .MuiSlider-track": {
+														backgroundColor: (theme.palette[categoryColors["visual"]] as PaletteColor).main, // ✅ Change la couleur de la barre
+													},
+													"& .MuiSlider-rail": {
+														backgroundColor: (theme.palette[categoryColors["visual"]] as PaletteColor).light, // ✅ Ajuste le rail
+													},
+												}}
+											/>
+										</Box>
+									)}
+									{category === "general" && (
+										<Box
+											marginBottom={2}
+											marginTop={2}>
+											<Typography variant="body1">Langue</Typography>
+											<Select
+												value={language}
+												fullWidth
+												onChange={handleLanguageChange}>
+												<MenuItem value="fr">Français</MenuItem>
+												<MenuItem value="en">Anglais</MenuItem>
+											</Select>
+										</Box>
+									)}
+								</FormGroup>
+							</CardContent>
+						</Card>
+					) : null
 				)}
 			</Box>
 		</Container>

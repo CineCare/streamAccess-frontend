@@ -1,16 +1,9 @@
+import { Palette } from "@mui/material";
 import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Types pour l'authentification
 interface AuthState {
 	isAuthenticated: boolean;
-}
-
-// Types pour les préférences d'accessibilité
-// Définition des types des options de préférence
-interface PreferenceOption {
-	key: string;
-	label: string;
-	value: boolean | number | string;
 }
 
 // Définition des types pour les catégories de préférences
@@ -25,10 +18,31 @@ interface AccessibilityState {
 	preferences: AccessibilityPreferences;
 }
 
+// Définition des couleurs des catégories basées sur le thème de MUI
+interface AccessibilityColors {
+	[category: string]: keyof Palette; // On utilise les clés de la palette MUI
+}
+
 // État initial pour l'authentification
 const initialAuthState: AuthState = {
 	isAuthenticated: false,
 };
+
+// État initial pour les couleurs des catégories
+const initialColorsState: AccessibilityColors = {
+	psychical: "success",
+	auditory: "info",
+	cognitive: "secondary",
+	visual: "warning",
+	general: "primary",
+};
+
+// Slice des couleurs des catégories
+const colorsSlice = createSlice({
+	name: "colors",
+	initialState: initialColorsState,
+	reducers: {},
+});
 
 // Slice d'authentification
 const authSlice = createSlice({
@@ -102,11 +116,13 @@ const store = configureStore({
 	reducer: {
 		auth: authSlice.reducer,
 		accessibility: accessibilitySlice.reducer,
+		colors: colorsSlice.reducer,
 	},
 });
 
 // Types pour les sélecteurs et dispatch
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-
+// Sélecteur pour récupérer les couleurs
+export const selectCategoryColors = (state: RootState) => state.colors;
 export default store;

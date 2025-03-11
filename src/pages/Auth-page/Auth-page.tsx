@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Box, Tabs, Tab, Typography, useTheme } from "@mui/material";
 import LoginForm from "../../components/LoginForm/LoginForm";
 import SignupForm from "../../components/SignupForm/SignupForm";
-import Logo from "../../assets/logo.svg";
+import Logo from "../../components/Logo/Logo";
 import AccessibilityOptions from "../../components/AccessibilityOptions/AccessibilityOptions";
 import SelectedPreferences from "../../components/SelectedPreferences/SelectedPreferences";
 import EcoStats from "../../components/EcoStats/EcoStats";
+import ThemeSwitcher from "../../components/ThemeSwitcher/ThemeSwitcher";
+
 
 const AuthPage: React.FC = () => {
 	const theme = useTheme();
@@ -44,11 +46,7 @@ const AuthPage: React.FC = () => {
 				</Typography>
 			</Box>
 			<Box sx={{ display: "flex", justifyContent: "center", marginBottom: 2 }}>
-				<img
-					src={Logo}
-					alt="Logo"
-					style={{ width: "10rem", height: "auto" }}
-				/>
+				<Logo />
 			</Box>
 
 			<Tabs
@@ -64,6 +62,7 @@ const AuthPage: React.FC = () => {
 				{value === 1 && <LoginForm />}
 				{value === 2 && <AccessibilityOptions />}
 			</Box>
+			<ThemeSwitcher />
 		</Box>
 	);
 };

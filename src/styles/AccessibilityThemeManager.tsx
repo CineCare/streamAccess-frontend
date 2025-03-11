@@ -1,16 +1,20 @@
 // src/styles/AccessibilityThemeManager.tsx
 import React, { useState, useMemo } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { defaultTheme, highContrastTheme, largeTextTheme } from "./theme";
+import { defaultTheme, highContrastTheme, softTheme, largeTextTheme, lightTheme } from "./theme";
 import { ThemeContext } from "./ThemeContext";
 
 export const AccessibilityThemeManager: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<"default" | "highContrast" | "largeText">("default");
+  const [theme, setTheme] = useState<"default" | "soft" | "lightTheme" | "highContrast" | "largeText">("default");
 
   const currentTheme = useMemo(() => {
     switch (theme) {
       case "highContrast":
         return highContrastTheme;
+      case "soft":
+        return softTheme;
+      case "lightTheme":
+        return lightTheme;
       case "largeText":
         return largeTextTheme;
       default:
