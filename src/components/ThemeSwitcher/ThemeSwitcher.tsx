@@ -26,7 +26,7 @@ const ThemeSwitcher: React.FC = () => {
     exclusive
     onChange={handleThemeChange}
     aria-label="Choisir un thème"
-    sx={{ display: "flex", justifyContent: "center", gap: 1, marginTop: 2 }}
+    sx={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 1, marginTop: 2, position: "absolute", bottom: 16, left: 16 }}
   >
     <ToggleButton value="default" aria-label="Thème Standard">
       <WaterIcon /> {/* 🌊 */}
