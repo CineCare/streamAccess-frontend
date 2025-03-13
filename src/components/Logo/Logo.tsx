@@ -1,5 +1,4 @@
 import React from "react";
-import { useTheme } from "@mui/material/styles";
 
 interface LogoProps {
 	customColor: string;
@@ -8,8 +7,6 @@ interface LogoProps {
 }
 
 const Logo: React.FC<LogoProps> = ({ customColor, width, marginRight }) => {
-	const theme = useTheme(); // 🎨 Récupération du thème actuel
-
 	return (
 		<div style={{ marginRight: marginRight }}>
 			<svg
