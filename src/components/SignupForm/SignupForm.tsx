@@ -20,7 +20,7 @@ const SignupForm: React.FC = () => {
 	};
 
 	const validateForm = () => {
-		let newErrors: Record<string, string> = {};
+		const newErrors: Record<string, string> = {};
 
 		if (!formData.pseudo.trim()) newErrors.pseudo = "Le pseudo est requis.";
 		if (!formData.email.match(/^\S+@\S+\.\S+$/)) newErrors.email = "L'email n'est pas valide.";
@@ -53,8 +53,12 @@ const SignupForm: React.FC = () => {
 
 			setSuccessMessage("Votre demande a été envoyée avec succès et sera traitée par un administrateur.");
 			setFormData({ pseudo: "", email: "", password: "", confirmPassword: "" });
-		} catch (error: any) {
-			setError({ global: error.message });
+		} catch (error) {
+			if (error instanceof Error) {
+				setError({ global: error.message });
+			} else {
+				setError({ global: "Une erreur inconnue est survenue." });
+			}
 		}
 	};
 

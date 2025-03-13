@@ -52,7 +52,6 @@ const moviesPerPage = 12;
 const Movies = () => {
 	const theme = useTheme();
 	const [movies, setMovies] = useState<Movie[]>([]);
-	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -79,10 +78,12 @@ const Movies = () => {
 
 			const data: Movie[] = await response.json();
 			setMovies(data);
-		} catch (error: any) {
-			setError(error.message);
-		} finally {
-			setLoading(false);
+		} catch (error) {
+			if (error instanceof Error) {
+				setError(error.message);
+			} else {
+				setError("An unknown error occurred");
+			}
 		}
 	}, []);
 
@@ -248,9 +249,9 @@ const Movies = () => {
 														}}
 														image={movie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` : "/images/camera.png"}
 														alt={`Affiche du film ${movie.title}`}
-														onError={(e: any) => {
-															e.target.onerror = null;
-															e.target.src = "/images/camera.png";
+														onError={(e) => {
+															(e.target as HTMLImageElement).onerror = null;
+															(e.target as HTMLImageElement).src = "/images/camera.png";
 														}}
 													/>
 													{/* Infos en bas */}
@@ -267,10 +268,7 @@ const Movies = () => {
 																direction="row"
 																spacing={0.5}>
 																{tagIconsToShow.map(
-																	(
-																		icon: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined,
-																		index: Key | null | undefined
-																	) => (
+																	(icon: ReactElement, index: Key) => (
 																		<Box key={index}>{icon}</Box>
 																	)
 																)}
@@ -314,7 +312,7 @@ const Movies = () => {
 						<Pagination
 							count={totalPages}
 							page={currentPage}
-							onChange={(_: any, newPage: SetStateAction<number>) => setCurrentPage(newPage)}
+							onChange={(_, newPage: SetStateAction<number>) => setCurrentPage(newPage)}
 							color="primary"
 						/>
 					</Box>

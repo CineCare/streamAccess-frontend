@@ -72,8 +72,12 @@ const CreateMovie: React.FC = () => {
         longSynopsis: "",
         teamComment: "",
       });
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     }
   };
 

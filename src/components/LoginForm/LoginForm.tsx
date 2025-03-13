@@ -16,7 +16,7 @@ const LoginForm: React.FC = () => {
 
 	const validateForm = () => {
 		let valid = true;
-		let newErrors: { email?: string; password?: string } = {};
+		const newErrors: { email?: string; password?: string } = {};
 
 		if (!formData.email) {
 			newErrors.email = "L'email est requis.";
@@ -57,8 +57,12 @@ const LoginForm: React.FC = () => {
       dispatch(login(data.user));
 			setServerMessage("Connexion réussie ! Vous allez être redirigé.");
 			navigate("/movies");
-		} catch (error: any) {
-			setServerMessage(error.message);
+		} catch (error) {
+			if (error instanceof Error) {
+				setServerMessage(error.message);
+			} else {
+				setServerMessage("Une erreur inconnue s'est produite.");
+			}
 		}finally {
       setLoading(false);
     }

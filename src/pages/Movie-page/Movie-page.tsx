@@ -56,7 +56,7 @@ const MoviePage: React.FC = () => {
         <CardMedia
           component="img"
           height="400"
-          image={`https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` || "/images/camera.png"}
+          image={movie.image?`https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}`:"/images/camera.png"}
           alt={`Affiche du film ${movie.title}`}
           sx={{ objectFit: "contain", cursor: "pointer" }}
           onClick={handleOpen} // Ouvre l'image en plein écran
@@ -86,7 +86,7 @@ const MoviePage: React.FC = () => {
           }}
         >
           <img
-            src={`https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` || "/images/camera.png"}
+            src={movie.image?`https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}`:"/images/camera.png"}
             alt={`Affiche du film ${movie.title}`}
             style={{ maxHeight: "90%", maxWidth: "90%", borderRadius: "8px" }}
             onClick={handleClose}

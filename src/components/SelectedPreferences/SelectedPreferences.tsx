@@ -49,9 +49,17 @@ const SelectedPreferences: React.FC = () => {
 	};
 
 	// Récupère les préférences activées
+	type ChipData = {
+		label: string;
+		category: string;
+		key: string;
+		removable: boolean;
+		icon: JSX.Element | null;
+	};
+
 	const getSelectedPreferences = () => {
-		const selectedPreferences: any[] = [];
-		const fixedPreferences: any[] = [];
+		const selectedPreferences: ChipData[] = [];
+		const fixedPreferences: ChipData[] = [];
 
 		Object.entries(preferences).forEach(([category, options]) => {
 			Object.entries(options).forEach(([key, value]) => {
