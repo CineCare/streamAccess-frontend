@@ -1,17 +1,24 @@
 import React from "react";
 import { useTheme } from "@mui/material/styles";
 
-const Logo: React.FC = () => {
+interface LogoProps {
+  customColor: string;
+	width?: number;
+	marginRight?: number;
+}
+
+const Logo: React.FC<LogoProps> = ({ customColor, width, marginRight }) => {
 	const theme = useTheme(); // 🎨 Récupération du thème actuel
 
 	return (
-		<svg
+		<div style={{ marginRight: marginRight }}>
+			<svg
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 442.23 518.27"
-			width="160"
+			width={width}
 			height="auto">
 			<defs>
-				<style>{`.cls-1 { fill: ${theme.palette.primary.main}; }`}</style>
+				<style>{`.cls-1 { fill: ${customColor}; }`}</style>
 			</defs>
 			<g
 				id="Calque_2"
@@ -98,6 +105,7 @@ const Logo: React.FC = () => {
 				</g>
 			</g>
 		</svg>
+		</div>
 	);
 };
 

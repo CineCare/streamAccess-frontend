@@ -46,7 +46,7 @@ const AuthPage: React.FC = () => {
 				</Typography>
 			</Box>
 			<Box sx={{ display: "flex", justifyContent: "center", marginBottom: 2 }}>
-				<Logo />
+				<Logo customColor={theme.palette.primary.main} width={160} />
 			</Box>
 
 			<Tabs

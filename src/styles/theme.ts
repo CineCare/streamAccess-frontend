@@ -4,31 +4,31 @@ import { createTheme } from "@mui/material/styles";
 export const defaultTheme = createTheme({
 	palette: {
 		primary: {
-			main: "#007D7D",
-			light: "#56B5B6",
+			main: "#007D7D", // 🌿 Conservé (vert du logo)
+			light: "#56B5B6", // 💙 Version plus douce
 		},
 		secondary: {
-			main: "#17A2B8",
+			main: "#D4A5A5", // 🌸 Rose poudré, apaisant
 		},
 		success: {
-			main: "#00C853",
+			main: "#A5D6A7", // 🌱 Vert pastel
 		},
 		info: {
-			main: "#a67ded",
+			main: "#C5B3E6", // 💜 Lavande douce
 		},
 		warning: {
-			main: "#FF9800",
+			main: "#E6C19C", // 🍂 Beige doré, plus tendre que l’orange
 		},
 		error: {
-			main: "#D32F2F",
+			main: "#E57373", // 🌺 Rouge rosé (moins agressif)
 		},
 		background: {
-			default: "#273340",
-			paper: "#4d5863",
+			default: "#273340", // 🌑 Conservé
+			paper: "#4D5863", // ☁ Conservé
 		},
 		text: {
-			primary: "#FFFFFF",
-			secondary: "#B0B0B0",
+			primary: "#FFFFFF", // ⚪ Conservé
+			secondary: "#D1D1D1", // 🔘 Gris clair, plus doux
 		},
 	},
 	typography: {
@@ -71,37 +71,37 @@ export const defaultTheme = createTheme({
 // 	},
 // });
 export const softTheme = createTheme({
-	palette: {
+		palette: {
 		primary: {
-			main: "#007D7D", // 🌿 Conservé (vert du logo)
-			light: "#56B5B6", // 💙 Version plus douce
+			main: "#6A89CC",
+			light: "#A8C0E6",
 		},
 		secondary: {
-			main: "#D4A5A5", // 🌸 Rose poudré, apaisant
+			main: "#E66767",
 		},
 		success: {
-			main: "#A5D6A7", // 🌱 Vert pastel
+			main: "#589b67",
 		},
 		info: {
-			main: "#C5B3E6", // 💜 Lavande douce
+			main: "#6c6693",
 		},
 		warning: {
-			main: "#E6C19C", // 🍂 Beige doré, plus tendre que l’orange
+			main: "#EAB543",
 		},
 		error: {
-			main: "#E57373", // 🌺 Rouge rosé (moins agressif)
+			main: "#EA8685",
 		},
 		background: {
-			default: "#273340", // 🌑 Conservé
-			paper: "#4D5863", // ☁ Conservé
+			default: "#e1eaf2",
+			paper: "#DADFE1",
 		},
 		text: {
-			primary: "#FFFFFF", // ⚪ Conservé
-			secondary: "#D1D1D1", // 🔘 Gris clair, plus doux
+			primary: "#2C3A47",
+			secondary: "#596275",
 		},
 	},
 	typography: {
-		fontFamily: "'Roboto', sans-serif",
+		fontFamily: "'Poppins', sans-serif",
 	},
 });
 
