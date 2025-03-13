@@ -8,7 +8,6 @@ import SelectedPreferences from "../../components/SelectedPreferences/SelectedPr
 import EcoStats from "../../components/EcoStats/EcoStats";
 import ThemeSwitcher from "../../components/ThemeSwitcher/ThemeSwitcher";
 
-
 const AuthPage: React.FC = () => {
 	const theme = useTheme();
 	const [value, setValue] = useState(0); // 0 pour Signup, 1 pour Login
@@ -46,7 +45,10 @@ const AuthPage: React.FC = () => {
 				</Typography>
 			</Box>
 			<Box sx={{ display: "flex", justifyContent: "center", marginBottom: 2 }}>
-				<Logo customColor={theme.palette.primary.main} width={160} />
+				<Logo
+					customColor={theme.palette.primary.main}
+					width={160}
+				/>
 			</Box>
 
 			<Tabs

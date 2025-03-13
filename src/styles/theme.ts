@@ -71,7 +71,7 @@ export const defaultTheme = createTheme({
 // 	},
 // });
 export const softTheme = createTheme({
-		palette: {
+	palette: {
 		primary: {
 			main: "#6A89CC",
 			light: "#A8C0E6",
@@ -105,53 +105,52 @@ export const softTheme = createTheme({
 	},
 });
 
-
 export const highContrastTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#FFD700", // 🟡 Doré - Conservé
-      light: "#FFEA70",
-      dark: "#C6A600",
-      contrastText: "#000000", // Texte noir sur fond doré
-    },
-    secondary: {
-      main: "#007BFF", // 🔵 Bleu électrique pour un bon contraste
-      light: "#66B2FF",
-      dark: "#0056B3",
-      contrastText: "#FFFFFF", // Texte blanc pour lisibilité
-    },
-    success: {
-      main: "#00FF00", // 🟢 Vert néon - Conservé
-      contrastText: "#000000",
-    },
-    info: {
-      main: "#00BFFF", // 🔵 Bleu clair néon - Conservé
-      contrastText: "#000000",
-    },
-    warning: {
-      main: "#FF00FF", // 🌸 Magenta vif pour un fort contraste
-      contrastText: "#FFFFFF",
-    },
-    error: {
-      main: "#FF2400", // 🔴 Rouge néon (plus fort que Crimson)
-      contrastText: "#FFFFFF",
-    },
-    background: {
-      default: "#000000", // ⚫ Fond noir - Conservé
-      paper: "#1A1A1A", // 🌑 Un noir moins profond pour éviter la fatigue visuelle
-    },
-    text: {
-      primary: "#FFFFFF", // ⚪ Blanc pour un contraste maximal
-      secondary: "#FFD700", // 🟡 Doré pour un accent visuel clair
-    },
-    action: {
-      active: "#FFFFFF",
-      hover: "#FF4500",
-      selected: "#FFD700",
-      disabled: "#666666",
-      disabledBackground: "#333333",
-    },
-  },
+	palette: {
+		primary: {
+			main: "#FFD700", // 🟡 Doré - Conservé
+			light: "#FFEA70",
+			dark: "#C6A600",
+			contrastText: "#000000", // Texte noir sur fond doré
+		},
+		secondary: {
+			main: "#007BFF", // 🔵 Bleu électrique pour un bon contraste
+			light: "#66B2FF",
+			dark: "#0056B3",
+			contrastText: "#FFFFFF", // Texte blanc pour lisibilité
+		},
+		success: {
+			main: "#00FF00", // 🟢 Vert néon - Conservé
+			contrastText: "#000000",
+		},
+		info: {
+			main: "#00BFFF", // 🔵 Bleu clair néon - Conservé
+			contrastText: "#000000",
+		},
+		warning: {
+			main: "#FF00FF", // 🌸 Magenta vif pour un fort contraste
+			contrastText: "#FFFFFF",
+		},
+		error: {
+			main: "#FF2400", // 🔴 Rouge néon (plus fort que Crimson)
+			contrastText: "#FFFFFF",
+		},
+		background: {
+			default: "#000000", // ⚫ Fond noir - Conservé
+			paper: "#1A1A1A", // 🌑 Un noir moins profond pour éviter la fatigue visuelle
+		},
+		text: {
+			primary: "#FFFFFF", // ⚪ Blanc pour un contraste maximal
+			secondary: "#FFD700", // 🟡 Doré pour un accent visuel clair
+		},
+		action: {
+			active: "#FFFFFF",
+			hover: "#FF4500",
+			selected: "#FFD700",
+			disabled: "#666666",
+			disabledBackground: "#333333",
+		},
+	},
 	typography: {
 		fontFamily: "'Arial Black', sans-serif",
 	},
@@ -231,7 +230,6 @@ export const lightTheme = createTheme({
 		fontFamily: "'Roboto', sans-serif",
 	},
 });
-
 
 // Autres thèmes accessibles (ajustez selon vos besoins)
 export const largeTextTheme = createTheme({
