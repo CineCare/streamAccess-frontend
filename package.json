@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
-    "ci_lint": "eslint . -o eslint.xml",
+    "ci_lint": "eslint . -f checkstyle -o eslint.xml",
     "preview": "vite preview"
   },
   "dependencies": {
