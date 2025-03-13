@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, SetStateAction } from "react";
+import { useState, useEffect, useCallback, Key, ReactElement, SetStateAction } from "react";
 import {
 	Box,
 	Grid,
@@ -52,7 +52,6 @@ const moviesPerPage = 12;
 const Movies = () => {
 	const theme = useTheme();
 	const [movies, setMovies] = useState<Movie[]>([]);
-	const [error, setError] = useState<string | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [yearFilter, setYearFilter] = useState("");
@@ -80,9 +79,9 @@ const Movies = () => {
 			setMovies(data);
 		} catch (error) {
 			if (error instanceof Error) {
-				setError(error.message);
+				console.error(error.message);
 			} else {
-				setError("An unknown error occurred");
+				console.error("An unknown error occurred");
 			}
 		}
 	}, []);
