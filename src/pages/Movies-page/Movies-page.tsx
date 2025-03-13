@@ -1,11 +1,30 @@
-import { useState, useEffect, useCallback, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal } from "react";
-import { Box, Grid, Typography, Card, CardContent, CardMedia, AppBar, Toolbar, TextField, Autocomplete, Select, MenuItem, InputLabel, FormControl, useTheme, alpha, Stack, IconButton } from "@mui/material";
+import { useState, useEffect, useCallback, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, SetStateAction } from "react";
+import {
+	Box,
+	Grid,
+	Typography,
+	Card,
+	CardContent,
+	CardMedia,
+	AppBar,
+	Toolbar,
+	TextField,
+	Autocomplete,
+	Select,
+	MenuItem,
+	InputLabel,
+	FormControl,
+	useTheme,
+	alpha,
+	Stack,
+	IconButton,
+	Pagination,
+} from "@mui/material";
 import DvrIcon from "@mui/icons-material/Dvr";
 import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SubtitlesIcon from "@mui/icons-material/Subtitles";
 import Logo from "../../components/Logo/Logo";
-
 
 interface Movie {
 	id: number;
@@ -85,24 +104,30 @@ const Movies = () => {
 		<Box>
 			{/* Barre de Navigation */}
 			<AppBar position="sticky">
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        {/* Logo à gauche */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* <img src=logo alt="Logo" style={{ height: 40, marginRight: 10 }} /> */}
-          <Logo customColor={theme.palette.text.primary} width={40} marginRight={10}/>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            StreamAccess
-          </Typography>
-        </Box>
+				<Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+					{/* Logo à gauche */}
+					<Box sx={{ display: "flex", alignItems: "center" }}>
+						{/* <img src=logo alt="Logo" style={{ height: 40, marginRight: 10 }} /> */}
+						<Logo
+							customColor={theme.palette.text.primary}
+							width={40}
+							marginRight={10}
+						/>
+						<Typography
+							variant="h6"
+							sx={{ fontWeight: "bold" }}>
+							StreamAccess
+						</Typography>
+					</Box>
 
-        {/* Icône Profil à droite */}
-        <IconButton color="inherit">
-          <AccountCircleIcon fontSize="large" />
-        </IconButton>
-      </Toolbar>
+					{/* Icône Profil à droite */}
+					<IconButton color="inherit">
+						<AccountCircleIcon fontSize="large" />
+					</IconButton>
+				</Toolbar>
 			</AppBar>
 
-			<Box sx={{ padding: 3 }}>
+			<Box sx={{ padding: 2 }}>
 				{/* Filtres et Recherche */}
 				<Grid
 					container
@@ -162,118 +187,138 @@ const Movies = () => {
 					</Grid>
 				</Grid>
 
-				{/* Affichage des films */}
-				<Grid
-					container
-					spacing={2}
-					sx={{ marginTop: 1 }}>
-					{paginatedMovies.map(movie => {
-						const tagIconsToShow = movie.tags.map(tag => tagIcons[tag]);
-						return (
-							<Grid
-								item
-								xs={12}
-								sm={6}
-								md={4}
-								lg={3}
-								xl={2}
-								key={movie.id}>
-								<Box
-									sx={{
-										perspective: "1000px",
-										position: "relative",
-										height: "39vh",
-										"&:hover": { boxShadow: theme.shadows[4] },
-									}}>
-									<Box
-										className="flip-card-inner"
-										sx={{
-											position: "relative",
-											width: "100%",
-											height: "100%",
-											transformStyle: "preserve-3d",
-											transition: "transform 0.6s",
-											transform: flippedCard === movie.id ? "rotateY(180deg)" : "none",
-										}}
-										onClick={() => setFlippedCard(flippedCard === movie.id ? null : movie.id)}>
-										{/* Face avant */}
-										<Card
+				<Box sx={{ display: "flex", flexDirection: "column", minHeight: "84vh" }}>
+					{/* Contenu principal des films */}
+					<Box sx={{ flexGrow: 1 }}>
+						<Grid
+							container
+							spacing={2}
+							sx={{ marginTop: 0.5 }}>
+							{paginatedMovies.map(movie => {
+								const tagIconsToShow = movie.tags.map(tag => tagIcons[tag]);
+								return (
+									<Grid
+										item
+										xs={12}
+										sm={6}
+										md={4}
+										lg={3}
+										xl={2}
+										key={movie.id}>
+										<Box
 											sx={{
-												position: "absolute",
-												width: "100%",
-												height: "100%",
-												display: "flex",
-												flexDirection: "row",
-												backgroundColor: theme.palette.background.paper,
-												backfaceVisibility: "hidden",
-												boxShadow: theme.shadows[3],
+												perspective: "1000px",
+												position: "relative",
+												height: "37vh",
+												"&:hover": { boxShadow: theme.shadows[4] },
 											}}>
-											{/* Affiche */}
-											<CardMedia
-												component="img"
+											<Box
+												className="flip-card-inner"
 												sx={{
+													position: "relative",
 													width: "100%",
 													height: "100%",
-													objectFit: "cover",
-													position: "relative",
-													borderTopLeftRadius: 8,
-													borderBottomLeftRadius: 8,
+													transformStyle: "preserve-3d",
+													transition: "transform 0.6s",
+													transform: flippedCard === movie.id ? "rotateY(180deg)" : "none",
 												}}
-												image={movie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` : "/images/camera.png"}
-												alt={`Affiche du film ${movie.title}`}
-												onError={(e: any) => {
-													e.target.onerror = null;
-													e.target.src = "/images/camera.png";
-												}}
-											/>
-											{/* Infos en bas */}
-											<CardContent
-												sx={{ width: "100%", position: "absolute", bottom: 0, padding: 0.5, color: theme.palette.text.primary, backgroundColor: alpha(theme.palette.background.default, 0.7) }}>
-												<Typography variant="h6">{movie.title}</Typography>
+												onClick={() => setFlippedCard(flippedCard === movie.id ? null : movie.id)}>
+												{/* Face avant */}
+												<Card
+													sx={{
+														position: "absolute",
+														width: "100%",
+														height: "100%",
+														display: "flex",
+														flexDirection: "row",
+														backgroundColor: theme.palette.background.paper,
+														backfaceVisibility: "hidden",
+														boxShadow: theme.shadows[3],
+													}}>
+													{/* Affiche */}
+													<CardMedia
+														component="img"
+														sx={{
+															width: "100%",
+															height: "100%",
+															objectFit: "cover",
+															position: "relative",
+															borderTopLeftRadius: 8,
+															borderBottomLeftRadius: 8,
+														}}
+														image={movie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` : "/images/camera.png"}
+														alt={`Affiche du film ${movie.title}`}
+														onError={(e: any) => {
+															e.target.onerror = null;
+															e.target.src = "/images/camera.png";
+														}}
+													/>
+													{/* Infos en bas */}
+													<CardContent
+														sx={{ width: "100%", position: "absolute", bottom: 0, padding: 0.5, color: theme.palette.text.primary, backgroundColor: alpha(theme.palette.background.default, 0.7) }}>
+														<Typography variant="h6">{movie.title}</Typography>
 
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                          <Typography variant="body2">{movie.releaseYear}</Typography>
-                          <Stack direction="row" spacing={0.5}>
-                            {tagIconsToShow.map(
-															(
-																icon: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined,
-																index: Key | null | undefined
-															) => (
-																<Box key={index}>{icon}</Box>
-															) )}
-                          </Stack>
-                        </Stack>
-											</CardContent>
-										</Card>
+														<Stack
+															direction="row"
+															justifyContent="space-between"
+															alignItems="center">
+															<Typography variant="body2">{movie.releaseYear}</Typography>
+															<Stack
+																direction="row"
+																spacing={0.5}>
+																{tagIconsToShow.map(
+																	(
+																		icon: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined,
+																		index: Key | null | undefined
+																	) => (
+																		<Box key={index}>{icon}</Box>
+																	)
+																)}
+															</Stack>
+														</Stack>
+													</CardContent>
+												</Card>
 
-										{/* Face arrière */}
-										<Card
-											sx={{
-												position: "absolute",
-												width: "100%",
-												height: "100%",
-												backfaceVisibility: "hidden",
-												transform: "rotateY(180deg)",
-												backgroundColor: theme.palette.background.paper,
-												display: "flex",
-												flexDirection: "column",
-												justifyContent: "center",
-												textAlign: "center",
-												padding: "20px",
-												color: theme.palette.text.primary,
-												boxShadow: theme.shadows[4],
-												borderRadius: 2,
-											}}>
-											<Typography variant="h6">{movie.title}</Typography>
-											<Typography variant="body2">{movie.longSynopsis || "Synopsis non disponible"}</Typography>
-											<Typography variant="body2">{movie.teamComment || "Aucun commentaire de l'équipe"}</Typography>
-										</Card>
-									</Box>
-								</Box>
-							</Grid>
-						);
-					})}
-				</Grid>
+												{/* Face arrière */}
+												<Card
+													sx={{
+														position: "absolute",
+														width: "100%",
+														height: "100%",
+														backfaceVisibility: "hidden",
+														transform: "rotateY(180deg)",
+														backgroundColor: theme.palette.background.paper,
+														display: "flex",
+														flexDirection: "column",
+														justifyContent: "center",
+														textAlign: "center",
+														padding: "20px",
+														color: theme.palette.text.primary,
+														boxShadow: theme.shadows[4],
+														borderRadius: 2,
+													}}>
+													<Typography variant="h6">{movie.title}</Typography>
+													<Typography variant="body2">{movie.longSynopsis || "Synopsis non disponible"}</Typography>
+													<Typography variant="body2">{movie.teamComment || "Aucun commentaire de l'équipe"}</Typography>
+												</Card>
+											</Box>
+										</Box>
+									</Grid>
+								);
+							})}
+						</Grid>
+					</Box>
+
+					{/* Pagination */}
+					<Box sx={{ display: "flex", justifyContent: "center", marginTop: 3 }}>
+						<Pagination
+							count={totalPages}
+							page={currentPage}
+							onChange={(_: any, newPage: SetStateAction<number>) => setCurrentPage(newPage)}
+							color="primary"
+						/>
+					</Box>
+				</Box>
 			</Box>
 		</Box>
 	);
