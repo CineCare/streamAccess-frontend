@@ -40,6 +40,14 @@ pipeline {
             }
         }
 
+        stage('lint') {
+            steps {
+                sh '''
+                    npm run ci_lint
+                '''
+            }
+        }
+
         stage('build') {
             steps {
                 echo 'performing build'
