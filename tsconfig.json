@@ -1,5 +1,10 @@
 {
   "files": [],
+  "compilerOptions": {
+    "jsx": "react-jsx", // ✅ Active le support de JSX pour React
+    "esModuleInterop": true, // ✅ Évite les erreurs d'import avec Jest
+    "allowSyntheticDefaultImports": true // ✅ Améliore la compatibilité avec React
+  },
   "references": [
     {
       "path": "./tsconfig.app.json"
