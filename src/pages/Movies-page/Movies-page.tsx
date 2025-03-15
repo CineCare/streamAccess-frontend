@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, Key, ReactElement, SetStateAction } from "react";
+import { useNavigate } from "react-router-dom";
 import {
 	Box,
 	Grid,
@@ -6,8 +7,6 @@ import {
 	Card,
 	CardContent,
 	CardMedia,
-	AppBar,
-	Toolbar,
 	TextField,
 	Autocomplete,
 	Select,
@@ -19,12 +18,15 @@ import {
 	Stack,
 	IconButton,
 	Pagination,
+	Button,
 } from "@mui/material";
 import DvrIcon from "@mui/icons-material/Dvr";
 import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SubtitlesIcon from "@mui/icons-material/Subtitles";
-import Logo from "../../components/Logo/Logo";
+import PlayCircleIcon from "@mui/icons-material/PlayCircle";
+import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
+import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import Navbar from "../../components/Navbar/Navbar.tsx";
 
 interface Movie {
 	id: number;
@@ -51,12 +53,15 @@ const moviesPerPage = 12;
 
 const Movies = () => {
 	const theme = useTheme();
+	const navigate = useNavigate();
 	const [movies, setMovies] = useState<Movie[]>([]);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [yearFilter, setYearFilter] = useState("");
 	const [currentPage, setCurrentPage] = useState(1);
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
+	const [openModal, setOpenModal] = useState(false);
+	const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
 	const fetchMovies = useCallback(async () => {
 		try {
@@ -90,6 +95,12 @@ const Movies = () => {
 		fetchMovies();
 	}, [fetchMovies]);
 
+	useEffect(() => {
+		if (!openModal) {
+			setFlippedCard(null);
+		}
+	}, [openModal]);
+
 	const filteredMovies = movies.filter(
 		movie =>
 			movie.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -100,32 +111,15 @@ const Movies = () => {
 	const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
 	const paginatedMovies = filteredMovies.slice((currentPage - 1) * moviesPerPage, currentPage * moviesPerPage);
 
+	const handleCloseModal = () => {
+		setOpenModal(false);
+		setSelectedMovie(null);
+	};
+
 	return (
 		<Box>
 			{/* Barre de Navigation */}
-			<AppBar position="sticky">
-				<Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-					{/* Logo à gauche */}
-					<Box sx={{ display: "flex", alignItems: "center" }}>
-						{/* <img src=logo alt="Logo" style={{ height: 40, marginRight: 10 }} /> */}
-						<Logo
-							customColor={theme.palette.text.primary}
-							width={40}
-							marginRight={10}
-						/>
-						<Typography
-							variant="h6"
-							sx={{ fontWeight: "bold" }}>
-							StreamAccess
-						</Typography>
-					</Box>
-
-					{/* Icône Profil à droite */}
-					<IconButton color="inherit">
-						<AccountCircleIcon fontSize="large" />
-					</IconButton>
-				</Toolbar>
-			</AppBar>
+			<Navbar />
 
 			<Box sx={{ padding: 2 }}>
 				{/* Filtres et Recherche */}
@@ -222,7 +216,11 @@ const Movies = () => {
 													transition: "transform 0.6s",
 													transform: flippedCard === movie.id ? "rotateY(180deg)" : "none",
 												}}
-												onClick={() => setFlippedCard(flippedCard === movie.id ? null : movie.id)}>
+												onClick={() => {
+													if (!openModal) {
+														setFlippedCard(flippedCard === movie.id ? null : movie.id);
+													}
+												}}>
 												{/* Face avant */}
 												<Card
 													sx={{
@@ -248,11 +246,20 @@ const Movies = () => {
 														}}
 														image={movie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` : "/images/camera.png"}
 														alt={`Affiche du film ${movie.title}`}
-														onError={(e) => {
+														onError={e => {
 															(e.target as HTMLImageElement).onerror = null;
 															(e.target as HTMLImageElement).src = "/images/camera.png";
 														}}
 													/>
+													{/* Icône de lecture */}
+													<IconButton
+														sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", backgroundColor: alpha(theme.palette.primary.main, 0.6), color: "white" }}
+														onClick={e => {
+															e.stopPropagation();
+															navigate(`/movie/${movie.id}`);
+														}}>
+														<PlayCircleIcon fontSize="large" />
+													</IconButton>
 													{/* Infos en bas */}
 													<CardContent
 														sx={{ width: "100%", position: "absolute", bottom: 0, padding: 0.5, color: theme.palette.text.primary, backgroundColor: alpha(theme.palette.background.default, 0.7) }}>
@@ -266,11 +273,9 @@ const Movies = () => {
 															<Stack
 																direction="row"
 																spacing={0.5}>
-																{tagIconsToShow.map(
-																	(icon: ReactElement, index: Key) => (
-																		<Box key={index}>{icon}</Box>
-																	)
-																)}
+																{tagIconsToShow.map((icon: ReactElement, index: Key) => (
+																	<Box key={index}>{icon}</Box>
+																))}
 															</Stack>
 														</Stack>
 													</CardContent>
@@ -287,16 +292,116 @@ const Movies = () => {
 														backgroundColor: theme.palette.background.paper,
 														display: "flex",
 														flexDirection: "column",
-														justifyContent: "center",
-														textAlign: "center",
+														justifyContent: "space-between",
 														padding: "20px",
 														color: theme.palette.text.primary,
 														boxShadow: theme.shadows[4],
 														borderRadius: 2,
 													}}>
-													<Typography variant="h6">{movie.title}</Typography>
-													<Typography variant="body2">{movie.longSynopsis || "Synopsis non disponible"}</Typography>
-													<Typography variant="body2">{movie.teamComment || "Aucun commentaire de l'équipe"}</Typography>
+													<IconButton
+														sx={{
+															position: "absolute",
+															top: 8,
+															right: 8,
+															backgroundColor: alpha(theme.palette.primary.main, 0.7),
+															color: "white",
+															"&:hover": { backgroundColor: theme.palette.primary.dark },
+														}}
+														onClick={e => {
+															e.stopPropagation();
+															setSelectedMovie(movie);
+															setOpenModal(true);
+														}}>
+														<ZoomOutMapIcon />
+													</IconButton>
+													<Box>
+														<Typography variant="h6">{movie.title}</Typography>
+														<Box
+															sx={{
+																overflow: "hidden",
+																display: "-webkit-box",
+																WebkitBoxOrient: "vertical",
+																WebkitLineClamp: flippedCard !== movie.id ? "unset" : "10",
+															}}>
+															<Typography variant="body2">{movie.longSynopsis || "Synopsis non disponible"}</Typography>
+														</Box>
+													</Box>
+													<Box>
+														<Typography variant="body2">{movie.teamComment || "Aucun commentaire de l'équipe"}</Typography>
+														<Button
+															variant="contained"
+															color="primary"
+															sx={{ marginTop: 2 }}
+															fullWidth
+															onClick={() => navigate(`/movie/${movie.id}`)}>
+															Voir le film
+														</Button>
+														<Dialog
+															open={openModal}
+															onClose={handleCloseModal}
+															maxWidth="md"
+															fullWidth
+															sx={{
+																"& .MuiBackdrop-root": {
+																	backgroundColor: alpha(theme.palette.background.default, 0.1),
+																},
+															}}>
+															{selectedMovie && (
+																<>
+																	<DialogTitle>{selectedMovie.title}</DialogTitle>
+																	<DialogContent dividers>
+																		<Grid
+																			container
+																			spacing={2}>
+																			{/* Affiche du film */}
+																			<Grid
+																				item
+																				xs={12}
+																				md={4}>
+																				<CardMedia
+																					component="img"
+																					sx={{ width: "100%", borderRadius: 1 }}
+																					image={selectedMovie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${selectedMovie.image}` : "/images/camera.png"}
+																					alt={`Affiche du film ${selectedMovie.title}`}
+																				/>
+																			</Grid>
+
+																			{/* Informations */}
+																			<Grid
+																				item
+																				xs={12}
+																				md={8}>
+																				<Typography
+																					variant="body1"
+																					sx={{ marginBottom: 1 }}>
+																					{selectedMovie.longSynopsis || "Synopsis non disponible"}
+																				</Typography>
+																				<Typography
+																					variant="body2"
+																					sx={{ fontStyle: "italic", color: "gray", marginBottom: 2 }}>
+																					{selectedMovie.teamComment || "Aucun commentaire de l'équipe"}
+																				</Typography>
+																			</Grid>
+																		</Grid>
+																	</DialogContent>
+
+																	<DialogActions>
+																		<Button
+																			onClick={() => setOpenModal(false)}
+																			color="secondary">
+																			Fermer
+																		</Button>
+																		<Button
+																			variant="contained"
+																			color="primary"
+																			onClick={() => navigate(`/movie/${selectedMovie.id}`)}>
+																			Voir le film
+																		</Button>
+																	</DialogActions>
+																</>
+															)}
+														</Dialog>
+													</Box>
 												</Card>
 											</Box>
 										</Box>
