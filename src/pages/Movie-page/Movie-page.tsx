@@ -1,100 +1,90 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import { Box, CircularProgress, Typography, Card, CardMedia, CardContent, Modal } from "@mui/material";
+import { Box, CircularProgress, Typography, Card, CardContent, CardMedia, Button, TextField } from "@mui/material";
+import Navbar from "../../components/Navbar/Navbar";
 
-async function fetchMovieById(id: number) {
-  const token = localStorage.getItem("accessToken");
-  if (!token) throw new Error("Token manquant !");
+const fetchMovieById = async (id: number) => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
 
-  const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${id}`, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
 
-  if (!response.ok) throw new Error(`Erreur : ${response.status} (${response.statusText})`);
-  return response.json();
-}
+	if (!response.ok) throw new Error(`Erreur : ${response.status} (${response.statusText})`);
+	return response.json();
+};
 
-const MoviePage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [open, setOpen] = useState(false); // Pour gérer la modal d'image
+const MoviePage = () => {
+	const { id } = useParams<{ id: string }>();
+	const [comment, setComment] = useState("");
 
-  const { data: movie, error, isLoading } = useQuery(
-    ["movie", id],
-    () => fetchMovieById(parseInt(id || "0")),
-    { enabled: !!id }
-  );
+	const { data: movie, error, isLoading } = useQuery(["movie", id], () => fetchMovieById(Number(id)), { enabled: !!id });
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+	if (isLoading) {
+		return (
+			<Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+				<CircularProgress />
+			</Box>
+		);
+	}
 
-  if (isLoading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+	if (error) {
+		return (
+			<Box sx={{ padding: 3, textAlign: "center", height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+				<Typography
+					variant="h4"
+					color="error">{`Erreur : ${(error as Error).message}`}</Typography>
+			</Box>
+		);
+	}
 
-  if (error) {
-    return (
-      <Box sx={{ padding: 3, textAlign: "center" }}>
-        <Typography variant="h4" color="error">
-          {`Erreur : ${(error as Error).message}`}
-        </Typography>
-      </Box>
-    );
-  }
+	return (
+		<>
+						<Navbar />
 
-  return (
-    <Box sx={{ padding: 3 }}>
-      <Card sx={{ maxWidth: 800, margin: "0 auto", borderRadius: 2 }}>
-        <CardMedia
-          component="img"
-          height="400"
-          image={movie.image?`https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}`:"/images/camera.png"}
-          alt={`Affiche du film ${movie.title}`}
-          sx={{ objectFit: "contain", cursor: "pointer" }}
-          onClick={handleOpen} // Ouvre l'image en plein écran
-          />
-        <CardContent>
-          <Typography variant="h3" component="h1" gutterBottom>
-            {movie.title} ({movie.releaseYear})
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            <strong>Synopsis :</strong> {movie.longSynopsis || "Aucun synopsis disponible."}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Commentaire de l'équipe :</strong> {movie.teamComment || "Pas de commentaire pour l'instant."}
-          </Typography>
-        </CardContent>
-      </Card>
+			<Box sx={{ display: "grid", gridTemplateColumns: "1fr 3fr", gridTemplateRows: "1fr auto", height: "92vh", width: "100%", padding: 3, gap: 2 }}>
+				{/* Colonne de gauche - Affiche + Infos du film + Signalement */}
+				<Card sx={{ width: "100%", height: "100%", borderRadius: 2, overflow: "auto" }}>
+					<CardMedia
+						component="img"
+						height="300"
+						image={movie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` : "/images/camera.png"}
+						alt={`Affiche du film ${movie.title}`}
+						sx={{ objectFit: "contain" }}
+					/>
+					<CardContent>
+						<Typography variant="h4" component="h1" gutterBottom>
+							{movie.title} ({movie.releaseYear})
+						</Typography>
+						<Typography variant="body1" color="text.secondary" paragraph>
+							<strong>Synopsis :</strong> {movie.longSynopsis || "Aucun synopsis disponible."}
+						</Typography>
+						<Button variant="contained" color="secondary" fullWidth>Signaler un problème</Button>
+					</CardContent>
+				</Card>
 
-      {/* Modal pour afficher l'image en plein écran */}
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh",
-            backgroundColor: "rgba(0, 0, 0, 0.8)", // Fond semi-transparent
-          }}
-        >
-          <img
-            src={movie.image?`https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}`:"/images/camera.png"}
-            alt={`Affiche du film ${movie.title}`}
-            style={{ maxHeight: "90%", maxWidth: "90%", borderRadius: "8px" }}
-            onClick={handleClose}
-          />
-        </Box>
-      </Modal>
-    </Box>
-  );
+				{/* Zone Vidéo */}
+				<Box sx={{ width: "100%", height: "100%", backgroundColor: "black", display: "flex", justifyContent: "center", alignItems: "center" }}>
+					<Typography color="white">Lecteur Vidéo (à implémenter)</Typography>
+				</Box>
+
+				{/* Bande du bas - Commentaires */}
+				<Box sx={{ gridColumn: "span 2", width: "100%", paddingTop: 2 }}>
+					<Typography variant="h5" gutterBottom>Laisser un commentaire</Typography>
+          <Box sx={{ display: "flex" }}>
+            <TextField fullWidth multiline rows={2} variant="outlined" placeholder="Écrivez votre commentaire ici..." value={comment} onChange={e => setComment(e.target.value)} />
+            <Button variant="contained" color="primary" sx={{ marginTop: 1 }}>Envoyer</Button>
+          </Box>
+				</Box>
+			</Box>
+		</>
+	);
 };
 
 export default MoviePage;
