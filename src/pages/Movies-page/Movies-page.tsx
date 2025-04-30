@@ -128,9 +128,7 @@ const Movies = () => {
 					spacing={2}
 					alignItems="center">
 					<Grid
-						item
-						xs={12}
-						md={4}>
+						size={{ xs: 12, md: 4 }}>
 						<TextField
 							fullWidth
 							label="Rechercher un film"
@@ -141,9 +139,7 @@ const Movies = () => {
 					</Grid>
 
 					<Grid
-						item
-						xs={12}
-						md={4}>
+						size={{ xs: 12, md: 4 }}>
 						<Autocomplete
 							multiple
 							options={mockTags}
@@ -160,9 +156,7 @@ const Movies = () => {
 					</Grid>
 
 					<Grid
-						item
-						xs={12}
-						md={4}>
+						size={{ xs: 12, md: 4 }}>
 						<FormControl fullWidth>
 							<InputLabel>Année</InputLabel>
 							<Select
@@ -187,23 +181,21 @@ const Movies = () => {
 						<Grid
 							container
 							spacing={2}
-							sx={{ marginTop: 0.5 }}>
+							sx={{
+								marginTop: 0.5,
+								justifyContent: "center",
+							}}>
 							{paginatedMovies.map(movie => {
 								const tagIconsToShow = movie.tags.map(tag => tagIcons[tag]);
 								return (
 									<Grid
-										item
-										xs={12}
-										sm={6}
-										md={4}
-										lg={3}
-										xl={2}
+										size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}
 										key={movie.id}>
 										<Box
 											sx={{
 												perspective: "1000px",
 												position: "relative",
-												height: "37vh",
+												height: { xs: "50vh", sm: "40vh", md: "37vh" },
 												"&:hover": { boxShadow: theme.shadows[4] },
 											}}>
 											<Box
@@ -239,7 +231,7 @@ const Movies = () => {
 														sx={{
 															width: "100%",
 															height: "100%",
-															objectFit: "cover",
+															objectFit: "contain",
 															position: "relative",
 															borderTopLeftRadius: 8,
 															borderBottomLeftRadius: 8,
@@ -355,9 +347,7 @@ const Movies = () => {
 																			spacing={2}>
 																			{/* Affiche du film */}
 																			<Grid
-																				item
-																				xs={12}
-																				md={4}>
+																				 size={{ xs: 12, sm: 4 }}>
 																				<CardMedia
 																					component="img"
 																					sx={{ width: "100%", borderRadius: 1 }}
@@ -368,9 +358,7 @@ const Movies = () => {
 
 																			{/* Informations */}
 																			<Grid
-																				item
-																				xs={12}
-																				md={8}>
+																				 size={{ xs: 12, sm: 8 }}>
 																				<Typography
 																					variant="body1"
 																					sx={{ marginBottom: 1 }}>

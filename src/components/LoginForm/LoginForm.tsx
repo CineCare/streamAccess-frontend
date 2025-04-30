@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent, Typography,CircularProgress } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useDispatch } from 'react-redux';
-import { login } from '../../providers/store';
+import { login, setUserInfo } from '../../providers/store';
 import { useNavigate } from 'react-router-dom';
 
 const LoginForm: React.FC = () => {
@@ -52,9 +52,27 @@ const LoginForm: React.FC = () => {
 				const errorData = await response.json();
 				throw new Error(errorData.message || "Erreur lors de la connexion.");
 			}
+
 			const data = await response.json();
-      localStorage.setItem('accessToken', data.accessToken);
-      dispatch(login(data.user));
+			localStorage.setItem("accessToken", data.accessToken); // Stocke le token
+
+			// Fetch des données utilisateur
+			const userResponse = await fetch("https://streamaccess-dev-backend.codevert.org/users/me", {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${data.accessToken}`,
+				},
+			});
+
+			if (!userResponse.ok) {
+				throw new Error("Erreur lors de la récupération des données utilisateur.");
+			}
+
+			const userData = await userResponse.json();
+			dispatch(setUserInfo({ name: userData.pseudo, email: userData.email })); // Met à jour le store et le localStorage
+
+			dispatch(login());
 			setServerMessage("Connexion réussie ! Vous allez être redirigé.");
 			navigate("/movies");
 		} catch (error) {
@@ -63,9 +81,9 @@ const LoginForm: React.FC = () => {
 			} else {
 				setServerMessage("Une erreur inconnue s'est produite.");
 			}
-		}finally {
-      setLoading(false);
-    }
+		 } finally {
+			setLoading(false);
+		}
 	};
 
 	return (

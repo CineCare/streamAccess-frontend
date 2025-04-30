@@ -1,25 +1,70 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { CssBaseline } from '@mui/material';
-import AuthPage from './pages/Auth-page/Auth-page';
-import MoviesPage from './pages/Movies-page/Movies-page';
-import MoviePage from './pages/Movie-page/Movie-page';
-import CreateMovie from './pages/Create-Movie-page/Create-movie';
-import { AccessibilityThemeManager } from './styles/AccessibilityThemeManager'; // Import du gestionnaire de thèmes
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { CssBaseline } from "@mui/material";
+import { useSelector } from "react-redux";
+import { RootState } from "./providers/store";
+import AuthPage from "./pages/Auth-page/Auth-page";
+import MoviesPage from "./pages/Movies-page/Movies-page";
+import MoviePage from "./pages/Movie-page/Movie-page";
+import CreateMovie from "./pages/Create-Movie-page/Create-movie";
+import ProfilePage from "./pages/Profile-page/Profile-page";
+import { AccessibilityThemeManager } from "./styles/AccessibilityThemeManager";
 
-// Ajoute d'autres imports pour tes pages si nécessaire
+const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const token = localStorage.getItem("accessToken");
+
+  if (!isAuthenticated || !token) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 const App: React.FC = () => {
   return (
-    <AccessibilityThemeManager> {/* Gestionnaire de thème global */}
-      <CssBaseline /> {/* Pour appliquer les styles de base de MUI */}
-      <Router>
+    <AccessibilityThemeManager>
+      <CssBaseline />
+      <Router
+        future={{
+          v7_startTransition: true, // Active React.startTransition pour les mises à jour d'état
+          v7_relativeSplatPath: true, // Active la résolution relative des routes dans les splats
+        }}
+      >
         <Routes>
-          <Route path="/" element={<AuthPage />} /> {/* Page d'authentification */}
-          <Route path="/movies" element={<MoviesPage />} /> {/* Page du catalogue */}
-          <Route path="/movie/:id" element={<MoviePage />} /> {/* Page du catalogue */}
-          <Route path="/createmovie" element={<CreateMovie />} /> {/* Page du catalogue */}
-          {/* Ajoute d'autres routes ici */}
+          <Route path="/" element={<AuthPage />} />
+          <Route
+            path="/movies"
+            element={
+              <ProtectedRoute>
+                <MoviesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/movie/:id"
+            element={
+              <ProtectedRoute>
+                <MoviePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/createmovie"
+            element={
+              <ProtectedRoute>
+                <CreateMovie />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </AccessibilityThemeManager>
