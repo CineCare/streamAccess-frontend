@@ -12,8 +12,7 @@ const Logo: React.FC<LogoProps> = ({ customColor, width, marginRight }) => {
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 442.23 518.27"
-				width={width}
-				height="auto">
+				width={width}>
 				<defs>
 					<style>{`.cls-1 { fill: ${customColor}; }`}</style>
 				</defs>

@@ -89,10 +89,12 @@ Après avoir démarré l'application, ouvrez votre navigateur et accédez à htt
    - Sélectionnez les préférences de sous-titres et de voix via les paramètres.
 
 ## Tests
-Les tests sont essentiels pour garantir la qualité du code. Utilisez Jest pour exécuter les tests unitaires.
+Les tests sont essentiels pour garantir la qualité du code. Ce projet utilise Jest pour les tests unitaires et Testing Library pour les tests d'intégration.
 
 ### Exécution des tests
-- npm test
+- `npm test` : Exécute tous les tests.
+- `npm run test:unit` : Exécute uniquement les tests unitaires.
+- `npm run test:integration` : Exécute uniquement les tests d'intégration.
 
 ## License
 Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.

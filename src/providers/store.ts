@@ -1,5 +1,9 @@
 import { Palette } from "@mui/material";
 import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import storage from "redux-persist/lib/storage"; // Utilisation de localStorage
+import { persistReducer, persistStore } from "redux-persist";
+import { combineReducers } from "redux";
+import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 
 // Types pour l'authentification
 interface AuthState {
@@ -23,10 +27,7 @@ interface AccessibilityColors {
 	[category: string]: keyof Palette; // On utilise les clés de la palette MUI
 }
 
-// État initial pour l'authentification
-const initialAuthState: AuthState = {
-	isAuthenticated: false,
-};
+// État initial pour l'authentification (removed as it was unused)
 
 // État initial pour les couleurs des catégories
 const initialColorsState: AccessibilityColors = {
@@ -35,6 +36,18 @@ const initialColorsState: AccessibilityColors = {
 	cognitive: "secondary",
 	visual: "warning",
 	general: "primary",
+};
+
+// Configuration de redux-persist pour l'authentification
+const authPersistConfig = {
+	key: "auth",
+	storage,
+};
+
+// Configuration de redux-persist pour l'utilisateur
+const userPersistConfig = {
+	key: "user",
+	storage,
 };
 
 // Slice des couleurs des catégories
@@ -47,7 +60,7 @@ const colorsSlice = createSlice({
 // Slice d'authentification
 const authSlice = createSlice({
 	name: "auth",
-	initialState: initialAuthState,
+	initialState: { isAuthenticated: false } as AuthState,
 	reducers: {
 		login: state => {
 			state.isAuthenticated = true;
@@ -60,10 +73,20 @@ const authSlice = createSlice({
 
 export const { login, logout } = authSlice.actions;
 
+// Fonction pour récupérer le thème depuis localStorage
+const getInitialTheme = (): string => {
+	if (typeof window !== "undefined" && localStorage) {
+		const savedTheme = localStorage.getItem("theme");
+		return savedTheme || "default";
+	}
+	return "default";
+};
+
 // État initial pour les préférences d'accessibilité
 const initialAccessibilityState: AccessibilityState = {
 	preferences: {
 		general: {
+			theme: getInitialTheme(), // Récupère le thème depuis localStorage
 			simplifiedMode: false,
 			audioGuide: false,
 			softMode: false,
@@ -106,19 +129,56 @@ const accessibilitySlice = createSlice({
 				state.preferences[category][option] = value; // On s'assure de bien mettre à jour la valeur boolean
 			}
 		},
+		setThemePreference: (state, action: PayloadAction<string>) => {
+			state.preferences.general.theme = action.payload; // Met à jour le thème dans Redux
+			localStorage.setItem("theme", action.payload); // Sauvegarde le thème dans localStorage
+		},
 	},
 });
 
-export const { setPreference } = accessibilitySlice.actions;
+export const { setPreference, setThemePreference } = accessibilitySlice.actions;
 
-// Configuration du store
+// Slice utilisateur
+const userSlice = createSlice({
+	name: "user",
+	initialState: {
+		name: "",
+		email: "",
+		avatar: "https://i.pravatar.cc/300?img=68", // Avatar par défaut
+	},
+	reducers: {
+		setUserAvatar: (state, action) => {
+			state.avatar = action.payload;
+		},
+		setUserInfo: (state, action: PayloadAction<{ name: string; email: string }>) => {
+			state.name = action.payload.name;
+			state.email = action.payload.email;
+		},
+	},
+});
+
+export const { setUserAvatar, setUserInfo } = userSlice.actions;
+
+// Combine reducers
+const rootReducer = combineReducers({
+	auth: persistReducer(authPersistConfig, authSlice.reducer),
+	user: persistReducer(userPersistConfig, userSlice.reducer),
+	accessibility: accessibilitySlice.reducer,
+	colors: colorsSlice.reducer,
+});
+
+// Configuration du store avec middleware pour ignorer les actions non sérialisables
 const store = configureStore({
-	reducer: {
-		auth: authSlice.reducer,
-		accessibility: accessibilitySlice.reducer,
-		colors: colorsSlice.reducer,
-	},
+	reducer: rootReducer,
+	middleware: getDefaultMiddleware =>
+		getDefaultMiddleware({
+			serializableCheck: {
+				ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER], // Ignore les actions redux-persist
+			},
+		}),
 });
+
+export const persistor = persistStore(store);
 
 // Types pour les sélecteurs et dispatch
 export type RootState = ReturnType<typeof store.getState>;

@@ -1,8 +1,10 @@
 // src/styles/ThemeContext.ts
-import { createContext, useContext } from "react";
+import { createContext } from "react"; // Suppression de `useContext` inutilisé
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, setThemePreference } from "../providers/store"; // Import de l'action Redux
 
 // Types pour les thèmes
-type ThemeType = "default" | "highContrast" | "soft" | "lightTheme" | "largeText";
+export type ThemeType = "default" | "highContrast" | "soft" | "lightTheme" | "largeText";
 
 interface ThemeContextProps {
 	theme: ThemeType;
@@ -14,9 +16,12 @@ export const ThemeContext = createContext<ThemeContextProps | undefined>(undefin
 
 // Custom hook pour consommer le contexte
 export const useThemeContext = () => {
-	const context = useContext(ThemeContext);
-	if (!context) {
-		throw new Error("useThemeContext must be used within a ThemeProvider");
-	}
-	return context;
+	const dispatch = useDispatch();
+	const theme = useSelector((state: RootState) => state.accessibility.preferences.general.theme || "default");
+
+	const setTheme = (newTheme: ThemeType) => {
+		dispatch(setThemePreference(newTheme)); // Met à jour le thème dans le store
+	};
+
+	return { theme, setTheme };
 };

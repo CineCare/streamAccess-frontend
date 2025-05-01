@@ -64,7 +64,16 @@ const AuthPage: React.FC = () => {
 				{value === 1 && <LoginForm />}
 				{value === 2 && <AccessibilityOptions />}
 			</Box>
-			<ThemeSwitcher />
+			<Box
+				sx={{
+					position: "absolute",
+					bottom: 16, // Positionné en bas
+					left: 16, // Positionné à gauche
+					zIndex: 1000, // Assure que le composant reste au-dessus du contenu
+				}}
+			>
+				<ThemeSwitcher layout="vertical" showLabels={false} /> {/* Icônes verticales sans labels */}
+			</Box>
 		</Box>
 	);
 };
