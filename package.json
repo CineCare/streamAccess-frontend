@@ -9,7 +9,9 @@
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "ci_lint": "eslint . -f checkstyle -o eslint.xml",
     "preview": "vite preview",
-    "test": "jest --config jest.config.ts"
+    "test": "jest --config jest.config.ts",
+    "test:unit": "jest --config jest.config.ts --testPathPattern=unit",
+    "test:integration": "jest --config jest.config.ts --testPathPattern=integration"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

@@ -36,40 +36,6 @@ export const defaultTheme = createTheme({
 	},
 });
 
-// export const softTheme = createTheme({
-// 	palette: {
-// 		primary: {
-// 			main: "#6A89CC",
-// 			light: "#A8C0E6",
-// 		},
-// 		secondary: {
-// 			main: "#E66767",
-// 		},
-// 		success: {
-// 			main: "#589b67",
-// 		},
-// 		info: {
-// 			main: "#6c6693",
-// 		},
-// 		warning: {
-// 			main: "#EAB543",
-// 		},
-// 		error: {
-// 			main: "#EA8685",
-// 		},
-// 		background: {
-// 			default: "#e1eaf2",
-// 			paper: "#DADFE1",
-// 		},
-// 		text: {
-// 			primary: "#2C3A47",
-// 			secondary: "#596275",
-// 		},
-// 	},
-// 	typography: {
-// 		fontFamily: "'Poppins', sans-serif",
-// 	},
-// });
 export const softTheme = createTheme({
 	palette: {
 		primary: {
@@ -105,6 +71,8 @@ export const softTheme = createTheme({
 	},
 });
 
+// Suggestion : Ajouter des commentaires pour expliquer les choix de couleurs
+// Exemple : Le contraste élevé est conçu pour les utilisateurs ayant des déficiences visuelles.
 export const highContrastTheme = createTheme({
 	palette: {
 		primary: {

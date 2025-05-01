@@ -79,7 +79,7 @@ const ProfilePage: React.FC = () => {
             color="primary"
             fullWidth
             sx={{ marginBottom: 2 }}
-            onClick={() => console.log("Modifier le profil")}
+            onClick={() => console.log("Modifier le profil")} // TODO: Implémenter la logique de modification
           >
             Modifier le profil
           </Button>
@@ -87,7 +87,7 @@ const ProfilePage: React.FC = () => {
             variant="outlined"
             color="error"
             fullWidth
-            onClick={() => console.log("Supprimer le compte")}
+            onClick={() => console.log("Supprimer le compte")} // TODO: Implémenter la logique de suppression
           >
             Supprimer le compte
           </Button>

@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const token = localStorage.getItem("accessToken");
 
   if (!isAuthenticated || !token) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace state={{ from: location.pathname }} />;
   }
 
   return children;

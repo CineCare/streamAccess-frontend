@@ -73,10 +73,20 @@ const authSlice = createSlice({
 
 export const { login, logout } = authSlice.actions;
 
+// Fonction pour récupérer le thème depuis localStorage
+const getInitialTheme = (): string => {
+	if (typeof window !== "undefined" && localStorage) {
+		const savedTheme = localStorage.getItem("theme");
+		return savedTheme || "default";
+	}
+	return "default";
+};
+
 // État initial pour les préférences d'accessibilité
 const initialAccessibilityState: AccessibilityState = {
 	preferences: {
 		general: {
+			theme: getInitialTheme(), // Récupère le thème depuis localStorage
 			simplifiedMode: false,
 			audioGuide: false,
 			softMode: false,
@@ -119,10 +129,14 @@ const accessibilitySlice = createSlice({
 				state.preferences[category][option] = value; // On s'assure de bien mettre à jour la valeur boolean
 			}
 		},
+		setThemePreference: (state, action: PayloadAction<string>) => {
+			state.preferences.general.theme = action.payload; // Met à jour le thème dans Redux
+			localStorage.setItem("theme", action.payload); // Sauvegarde le thème dans localStorage
+		},
 	},
 });
 
-export const { setPreference } = accessibilitySlice.actions;
+export const { setPreference, setThemePreference } = accessibilitySlice.actions;
 
 // Slice utilisateur
 const userSlice = createSlice({
