@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Key, ReactElement, SetStateAction } from "react";
+import { useState, useEffect, Key, ReactElement, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import {
 	Box,
@@ -27,6 +27,8 @@ import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar.tsx";
+import { useSelector } from "react-redux";
+import { RootState } from "../../providers/store";
 
 interface Movie {
 	id: number;
@@ -49,12 +51,12 @@ const tagIcons: { [key: string]: ReactElement } = {
 	Accessible: <AccessibilityNewIcon />,
 	"Audio description": <DvrIcon />,
 };
-const moviesPerPage = 12;
+const moviesPerPage = 16;
 
 const Movies = () => {
 	const theme = useTheme();
 	const navigate = useNavigate();
-	const [movies, setMovies] = useState<Movie[]>([]);
+	const movies = useSelector((state: RootState) => state.movies.list); // Récupère la liste des films depuis le store
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [yearFilter, setYearFilter] = useState("");
@@ -62,38 +64,6 @@ const Movies = () => {
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
 	const [openModal, setOpenModal] = useState(false);
 	const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-
-	const fetchMovies = useCallback(async () => {
-		try {
-			const token = localStorage.getItem("accessToken");
-			if (!token) throw new Error("Token manquant !");
-
-			const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies`, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-			});
-
-			if (!response.ok) {
-				throw new Error(`Erreur : ${response.status} (${response.statusText})`);
-			}
-
-			const data: Movie[] = await response.json();
-			setMovies(data);
-		} catch (error) {
-			if (error instanceof Error) {
-				console.error(error.message);
-			} else {
-				console.error("An unknown error occurred");
-			}
-		}
-	}, []);
-
-	useEffect(() => {
-		fetchMovies();
-	}, [fetchMovies]);
 
 	useEffect(() => {
 		if (!openModal) {
@@ -163,13 +133,15 @@ const Movies = () => {
 								value={yearFilter}
 								onChange={e => setYearFilter(e.target.value)}>
 								<MenuItem value="">Toutes</MenuItem>
-								{[...new Set(movies.map(m => m.releaseYear))].map(year => (
-									<MenuItem
-										key={year}
-										value={year.toString()}>
-										{year}
-									</MenuItem>
-								))}
+								{[...new Set(movies.map(m => m.releaseYear))]
+									.sort((a, b) => b - a)
+									.map(year => (
+										<MenuItem
+											key={year}
+											value={year.toString()}>
+											{year}
+										</MenuItem>
+									))}
 							</Select>
 						</FormControl>
 					</Grid>
@@ -189,7 +161,7 @@ const Movies = () => {
 								const tagIconsToShow = movie.tags.map(tag => tagIcons[tag]);
 								return (
 									<Grid
-										size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}
+										size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 1.5 }}
 										key={movie.id}>
 										<Box
 											sx={{
@@ -219,6 +191,7 @@ const Movies = () => {
 														position: "absolute",
 														width: "100%",
 														height: "100%",
+														aspectRatio: '2 / 3',
 														display: "flex",
 														flexDirection: "row",
 														backgroundColor: theme.palette.background.paper,
@@ -231,7 +204,7 @@ const Movies = () => {
 														sx={{
 															width: "100%",
 															height: "100%",
-															objectFit: "contain",
+															objectFit: "cover",
 															position: "relative",
 															borderTopLeftRadius: 8,
 															borderBottomLeftRadius: 8,
@@ -255,7 +228,16 @@ const Movies = () => {
 													{/* Infos en bas */}
 													<CardContent
 														sx={{ width: "100%", position: "absolute", bottom: 0, padding: 0.5, color: theme.palette.text.primary, backgroundColor: alpha(theme.palette.background.default, 0.7) }}>
-														<Typography variant="h6">{movie.title}</Typography>
+														<Typography 
+															variant="h6" 
+															sx={{
+																overflow: "hidden",
+																textOverflow: "ellipsis",
+																whiteSpace: "nowrap",
+																width: "100%"
+															}}>
+															{movie.title}
+														</Typography>
 
 														<Stack
 															direction="row"

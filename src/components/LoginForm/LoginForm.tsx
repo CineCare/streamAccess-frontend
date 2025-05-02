@@ -4,6 +4,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useDispatch } from 'react-redux';
 import { login, setUserInfo } from '../../providers/store';
 import { useNavigate } from 'react-router-dom';
+import { useMovies } from '../../hooks/useMovies';
 
 const LoginForm: React.FC = () => {
 	const dispatch = useDispatch();
@@ -13,6 +14,7 @@ const LoginForm: React.FC = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [serverMessage, setServerMessage] = useState<string | null>(null);
+  const { ensureMoviesLoaded } = useMovies();
 
 	const validateForm = () => {
 		let valid = true;
@@ -73,6 +75,7 @@ const LoginForm: React.FC = () => {
 			dispatch(setUserInfo({ name: userData.pseudo, email: userData.email })); // Met à jour le store et le localStorage
 
 			dispatch(login());
+      await ensureMoviesLoaded(); // Charge les films si nécessaire
 			setServerMessage("Connexion réussie ! Vous allez être redirigé.");
 			navigate("/movies");
 		} catch (error) {

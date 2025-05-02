@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { CssBaseline } from "@mui/material";
-import { useSelector } from "react-redux";
-import { RootState } from "./providers/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, fetchMovies, AppDispatch } from "./providers/store";
 import AuthPage from "./pages/Auth-page/Auth-page";
 import MoviesPage from "./pages/Movies-page/Movies-page";
 import MoviePage from "./pages/Movie-page/Movie-page";
 import CreateMovie from "./pages/Create-Movie-page/Create-movie";
 import ProfilePage from "./pages/Profile-page/Profile-page";
 import { AccessibilityThemeManager } from "./styles/AccessibilityThemeManager";
+import ContentManagement from "./pages/ContentManagement/ContentManagement";
+import EditMovie from "./pages/EditMovie/EditMovie";
 
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -22,6 +24,12 @@ const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
 };
 
 const App: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchMovies()); // Charge les films dans le store après authentification
+  }, [dispatch]);
+
   return (
     <AccessibilityThemeManager>
       <CssBaseline />
@@ -62,6 +70,22 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/content-management"
+            element={
+              <ProtectedRoute>
+                <ContentManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editmovie/:id"
+            element={
+              <ProtectedRoute>
+                <EditMovie />
               </ProtectedRoute>
             }
           />

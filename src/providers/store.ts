@@ -1,5 +1,5 @@
 import { Palette } from "@mui/material";
-import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { configureStore, createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage"; // Utilisation de localStorage
 import { persistReducer, persistStore } from "redux-persist";
 import { combineReducers } from "redux";
@@ -144,11 +144,16 @@ const userSlice = createSlice({
 	initialState: {
 		name: "",
 		email: "",
-		avatar: "https://i.pravatar.cc/300?img=68", // Avatar par défaut
+		avatar: localStorage.getItem("userAvatar") || null, // Null déclenchera l'affichage de l'icône
 	},
 	reducers: {
 		setUserAvatar: (state, action) => {
-			state.avatar = action.payload;
+			state.avatar = action.payload; // Peut être null
+			if (action.payload) {
+				localStorage.setItem("userAvatar", action.payload);
+			} else {
+				localStorage.removeItem("userAvatar");
+			}
 		},
 		setUserInfo: (state, action: PayloadAction<{ name: string; email: string }>) => {
 			state.name = action.payload.name;
@@ -159,12 +164,67 @@ const userSlice = createSlice({
 
 export const { setUserAvatar, setUserInfo } = userSlice.actions;
 
+// Slice pour les films
+export interface Movie {
+	id: number;
+	title: string;
+	releaseYear: number;
+	image?: string;
+	producerId?: number;
+	directorId?: number | null;
+	shortSynopsis?: string | null;
+	longSynopsis?: string | null;
+	teamComment?: string | null;
+	tags: string[];
+}
+
+interface MoviesState {
+	list: Movie[];
+}
+
+const initialMoviesState: MoviesState = {
+	list: [],
+};
+
+// Thunk pour récupérer les films
+export const fetchMovies = createAsyncThunk("movies/fetchMovies", async (_, { rejectWithValue }) => {
+	try {
+		const token = localStorage.getItem("accessToken");
+		if (!token) throw new Error("Token manquant !");
+		const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		if (!response.ok) throw new Error(`Erreur : ${response.status} (${response.statusText})`);
+		return await response.json();
+	} catch (error) {
+		return rejectWithValue(error instanceof Error ? error.message : "Erreur inconnue");
+	}
+});
+
+const moviesSlice = createSlice({
+	name: "movies",
+	initialState: initialMoviesState,
+	reducers: {},
+	extraReducers: builder => {
+		builder.addCase(fetchMovies.fulfilled, (state, action) => {
+			state.list = action.payload;
+		});
+	},
+});
+
+export const moviesReducer = moviesSlice.reducer;
+
 // Combine reducers
 const rootReducer = combineReducers({
 	auth: persistReducer(authPersistConfig, authSlice.reducer),
 	user: persistReducer(userPersistConfig, userSlice.reducer),
 	accessibility: accessibilitySlice.reducer,
 	colors: colorsSlice.reducer,
+	movies: moviesReducer,
 });
 
 // Configuration du store avec middleware pour ignorer les actions non sérialisables
