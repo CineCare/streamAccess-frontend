@@ -24,6 +24,10 @@ import Badge from '@mui/material/Badge'; // Import du badge pour les notificatio
 import NotificationsIcon from '@mui/icons-material/Notifications'; // Icône pour les notifications
 import SettingsIcon from '@mui/icons-material/Settings'; // Icône pour la gestion des contenus
 import { useAvatar } from '../../hooks/useAvatar';
+import Modal from '@mui/material/Modal'; // Import de la modale
+import List from '@mui/material/List'; // Import de la liste
+import ListItem from '@mui/material/ListItem'; // Import des éléments de la liste
+import ListItemText from '@mui/material/ListItemText'; // Import du texte des éléments
 
 const Navbar: React.FC = () => {
   const theme = useTheme();
@@ -32,6 +36,26 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [themeDrawerOpen, setThemeDrawerOpen] = useState(false); // Renommer la variable d'état
   const { avatar } = useAvatar();
+  const [notifications, setNotifications] = useState([
+    { id: 1, text: "Notification joueur 1", read: false },
+    { id: 2, text: "Notification système 1", read: true },
+    { id: 3, text: "Notification joueur 2", read: false },
+  ]); // Exemple de notifications
+  const [notificationModalOpen, setNotificationModalOpen] = useState(false);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const handleNotificationClick = (id: number) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  };
+
+  const handleNotificationHover = (id: number) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -70,6 +94,18 @@ const Navbar: React.FC = () => {
             sx={{ marginRight: 2 }}
           >
             <PaletteIcon /> {/* Icône pour ouvrir la sélection des thèmes */}
+          </IconButton>
+          <IconButton
+            color="inherit"
+            onClick={() => setNotificationModalOpen(true)}
+          >
+            <Badge
+              badgeContent={unreadCount}
+              color="error"
+              sx={{ "& .MuiBadge-badge": { fontSize: "0.75rem", height: 20, minWidth: 20 } }}
+            >
+              <NotificationsIcon fontSize="small" />
+            </Badge>
           </IconButton>
           <IconButton color="inherit" onClick={handleMenuOpen}>
             <Avatar src={avatar} alt="User Avatar">
@@ -110,7 +146,7 @@ const Navbar: React.FC = () => {
             <MenuItem
               onClick={() => {
                 handleMenuClose();
-                navigate('/accessibility-options');
+                navigate('/accessibility-options'); // Redirige vers la page des options d'accessibilité
               }}
               sx={{
                 display: "flex",
@@ -123,32 +159,7 @@ const Navbar: React.FC = () => {
               }}
             >
               <AccessibilityIcon fontSize="small" />
-              <Typography variant="body1" component="span">Options d'accessibilité</Typography> {/* Utilisation de component="span" */}
-            </MenuItem>
-            <Divider sx={{ my: 1 }} /> {/* Séparateur */}
-            <MenuItem
-              onClick={() => {
-                handleMenuClose();
-                navigate('/notifications');
-              }}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                padding: "8px 16px", // Ajuste le padding
-                "&:hover": {
-                  backgroundColor: theme.palette.action.hover,
-                },
-              }}
-            >
-              <Badge
-                badgeContent={5} // Exemple : 5 notifications non lues
-                color="error"
-                sx={{ "& .MuiBadge-badge": { fontSize: "0.75rem", height: 20, minWidth: 20 } }}
-              >
-                <NotificationsIcon fontSize="small" />
-              </Badge>
-              <Typography variant="body1" component="span">Notifications</Typography>
+              <Typography variant="body1" component="span">Options d'accessibilité</Typography>
             </MenuItem>
             <Divider sx={{ my: 1 }} /> {/* Séparateur */}
             <MenuItem
@@ -183,13 +194,12 @@ const Navbar: React.FC = () => {
               }}
             >
               <LogoutIcon fontSize="small" sx={{ color: theme.palette.error.main }} /> {/* Icône en couleur danger */}
-              <Typography variant="body1" component="span" sx={{ color: theme.palette.error.main }}>Se déconnecter</Typography> {/* Utilisation de component="span" */}
+              <Typography variant="body1" component="span" sx={{ color: theme.palette.error.main }}>Se déconnecter</Typography>
             </MenuItem>
           </Menu>
         </Box>
       </Toolbar>
 
-      {/* Remplacer la Dialog par un Drawer */}
       <Drawer
         anchor="bottom"
         open={themeDrawerOpen}
@@ -213,6 +223,66 @@ const Navbar: React.FC = () => {
           <ThemeSwitcher layout="horizontal" />
         </Box>
       </Drawer>
+
+      {/* Modale pour les notifications */}
+      <Modal
+        open={notificationModalOpen}
+        onClose={() => setNotificationModalOpen(false)}
+        aria-labelledby="notification-modal-title"
+        aria-describedby="notification-modal-description"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 500,
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography id="notification-modal-title" variant="h6" component="h2">
+              Notifications
+            </Typography>
+            <IconButton onClick={() => setNotificationModalOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <List>
+            {notifications.map((notification) => (
+              <ListItem
+                key={notification.id}
+                onClick={() => handleNotificationClick(notification.id)}
+                onMouseEnter={() => handleNotificationHover(notification.id)}
+                sx={{
+                  backgroundColor: notification.read
+                    ? 'transparent'
+                    : theme.palette.action.hover,
+                  borderRadius: 1,
+                  mb: 1,
+                  transition: 'background-color 0.3s',
+                }}
+              >
+                <ListItemText
+                  primary={notification.text}
+                  primaryTypographyProps={{
+                    fontWeight: notification.read ? 'normal' : 'bold',
+                  }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Modal>
     </AppBar>
   );
 };

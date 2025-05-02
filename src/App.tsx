@@ -11,6 +11,7 @@ import ProfilePage from "./pages/Profile-page/Profile-page";
 import { AccessibilityThemeManager } from "./styles/AccessibilityThemeManager";
 import ContentManagement from "./pages/ContentManagement/ContentManagement";
 import EditMovie from "./pages/EditMovie/EditMovie";
+import AccessibilityOptionsPage from "./pages/AccessibilityOptionsPage";
 
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -86,6 +87,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <EditMovie />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/accessibility-options"
+            element={
+              <ProtectedRoute>
+                <AccessibilityOptionsPage />
               </ProtectedRoute>
             }
           />
