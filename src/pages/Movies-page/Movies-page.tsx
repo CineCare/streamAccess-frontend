@@ -322,7 +322,8 @@ const Movies = () => {
 															}}>
 															{selectedMovie && (
 																<>
-																	<DialogTitle>{selectedMovie.title}</DialogTitle>
+																	<DialogTitle sx={{backgroundColor: theme.palette.primary.main + "20"}}
+																	>{selectedMovie.title}</DialogTitle>
 																	<DialogContent dividers>
 																		<Grid
 																			container
