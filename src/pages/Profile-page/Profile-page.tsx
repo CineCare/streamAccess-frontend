@@ -36,7 +36,7 @@ const ProfilePage: React.FC = () => {
         >
           {/* Avatar et nom */}
           <Avatar
-            src={user.avatar}
+            src={user.avatar || undefined}
             alt={user.name}
             sx={{ width: 100, height: 100, marginBottom: 2 }}
           />
