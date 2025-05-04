@@ -29,21 +29,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material
 import Navbar from "../../components/Navbar/Navbar.tsx";
 import { useSelector } from "react-redux";
 import { RootState } from "../../providers/store";
-
-interface Movie {
-	id: number;
-	title: string;
-	releaseYear: number;
-	image?: string;
-	producerId?: number;
-	directorId?: number | null;
-	shortSynopsis?: string | null;
-	longSynopsis?: string | null;
-	teamComment?: string | null;
-	tags: string[];
-}
-
-const mockTags = ["Sous-titres disponibles", "Scènes violentes", "Accessible", "Audio description"];
+import { Movie } from "../../types/interfaces";
 
 const tagIcons: { [key: string]: ReactElement } = {
 	"Sous-titres disponibles": <SubtitlesIcon />,
@@ -57,6 +43,7 @@ const Movies = () => {
 	const theme = useTheme();
 	const navigate = useNavigate();
 	const movies = useSelector((state: RootState) => state.movies.list); // Récupère la liste des films depuis le store
+	const tags = useSelector((state: RootState) => state.tags.list); // Récupère les tags depuis le store
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [yearFilter, setYearFilter] = useState("");
@@ -97,8 +84,7 @@ const Movies = () => {
 					container
 					spacing={2}
 					alignItems="center">
-					<Grid
-						size={{ xs: 12, md: 4 }}>
+					<Grid size={{ xs: 12, md: 4 }}>
 						<TextField
 							fullWidth
 							label="Rechercher un film"
@@ -108,11 +94,10 @@ const Movies = () => {
 						/>
 					</Grid>
 
-					<Grid
-						size={{ xs: 12, md: 4 }}>
+					<Grid size={{ xs: 12, md: 4 }}>
 						<Autocomplete
 							multiple
-							options={mockTags}
+							options={tags} // Utilise les tags du store
 							getOptionLabel={option => option}
 							value={selectedTags}
 							onChange={(_, newValue) => setSelectedTags(newValue)}
@@ -125,8 +110,7 @@ const Movies = () => {
 						/>
 					</Grid>
 
-					<Grid
-						size={{ xs: 12, md: 4 }}>
+					<Grid size={{ xs: 12, md: 4 }}>
 						<FormControl fullWidth>
 							<InputLabel>Année</InputLabel>
 							<Select
@@ -191,7 +175,7 @@ const Movies = () => {
 														position: "absolute",
 														width: "100%",
 														height: "100%",
-														aspectRatio: '2 / 3',
+														aspectRatio: "2 / 3",
 														display: "flex",
 														flexDirection: "row",
 														backgroundColor: theme.palette.background.paper,
@@ -228,13 +212,13 @@ const Movies = () => {
 													{/* Infos en bas */}
 													<CardContent
 														sx={{ width: "100%", position: "absolute", bottom: 0, padding: 0.5, color: theme.palette.text.primary, backgroundColor: alpha(theme.palette.background.default, 0.7) }}>
-														<Typography 
-															variant="h6" 
+														<Typography
+															variant="h6"
 															sx={{
 																overflow: "hidden",
 																textOverflow: "ellipsis",
 																whiteSpace: "nowrap",
-																width: "100%"
+																width: "100%",
 															}}>
 															{movie.title}
 														</Typography>
@@ -322,15 +306,13 @@ const Movies = () => {
 															}}>
 															{selectedMovie && (
 																<>
-																	<DialogTitle sx={{backgroundColor: theme.palette.primary.main + "20"}}
-																	>{selectedMovie.title}</DialogTitle>
+																	<DialogTitle sx={{ backgroundColor: theme.palette.primary.main + "20" }}>{selectedMovie.title}</DialogTitle>
 																	<DialogContent dividers>
 																		<Grid
 																			container
 																			spacing={2}>
 																			{/* Affiche du film */}
-																			<Grid
-																				 size={{ xs: 12, sm: 4 }}>
+																			<Grid size={{ xs: 12, sm: 4 }}>
 																				<CardMedia
 																					component="img"
 																					sx={{ width: "100%", borderRadius: 1 }}
@@ -340,8 +322,7 @@ const Movies = () => {
 																			</Grid>
 
 																			{/* Informations */}
-																			<Grid
-																				 size={{ xs: 12, sm: 8 }}>
+																			<Grid size={{ xs: 12, sm: 8 }}>
 																				<Typography
 																					variant="body1"
 																					sx={{ marginBottom: 1 }}>

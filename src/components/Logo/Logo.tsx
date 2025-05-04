@@ -1,12 +1,7 @@
 import React from "react";
+import { LogoProps } from "../../types/interfaces";
 
-interface LogoProps {
-	customColor: string;
-	width?: number;
-	marginRight?: number;
-}
-
-const Logo: React.FC<LogoProps> = ({ customColor, width, marginRight }) => {
+const Logo: React.FC<LogoProps> = ({ customColor = "#000", width = 50, marginRight = 0 }) => {
 	return (
 		<div style={{ marginRight: marginRight }}>
 			<svg

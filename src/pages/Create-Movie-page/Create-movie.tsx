@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar";
+import { createMovieWithImage } from "../../services/FetcherService";
 
 const CreateMovie: React.FC = () => {
 	const [formData, setFormData] = useState({
@@ -29,39 +30,8 @@ const CreateMovie: React.FC = () => {
 		setError(null);
 		setSuccess(false);
 
-		const token = localStorage.getItem("accessToken");
-		if (!token) {
-			setError("Token manquant !");
-			return;
-		}
-
 		try {
-			const formDataToSend = new FormData();
-			formDataToSend.append("title", formData.title);
-			formDataToSend.append("releaseYear", formData.releaseYear);
-			formDataToSend.append("image", (document.querySelector('input[name="image"]') as HTMLInputElement).files?.[0] || "");
-			if (formData.producerId) {
-				formDataToSend.append("producerId", formData.producerId);
-			}
-			if (formData.directorId) {
-				formDataToSend.append("directorId", formData.directorId);
-			}
-			formDataToSend.append("shortSynopsis", formData.shortSynopsis || "");
-			formDataToSend.append("longSynopsis", formData.longSynopsis || "");
-			formDataToSend.append("teamComment", formData.teamComment || "");
-
-			const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-				body: formDataToSend,
-			});
-
-			if (!response.ok) {
-				throw new Error(`Erreur : ${response.status} (${response.statusText})`);
-			}
-
+			await createMovieWithImage(formData);
 			setSuccess(true);
 			setFormData({
 				title: "",

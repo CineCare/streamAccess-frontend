@@ -9,8 +9,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Avatar from '@mui/material/Avatar';
 import { useTheme } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../providers/store'; // Import de l'action logout
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../providers/store';
+import { logout, markNotificationAsRead, markAllNotificationsAsRead } from '../../providers/store'; // Import des actions Redux
 import Logo from '../Logo/Logo';
 import ThemeSwitcher from '../ThemeSwitcher/ThemeSwitcher'; // Import du composant ThemeSwitcher
 import PaletteIcon from '@mui/icons-material/Palette'; // Icône pour la sélection des thèmes
@@ -28,33 +29,26 @@ import Modal from '@mui/material/Modal'; // Import de la modale
 import List from '@mui/material/List'; // Import de la liste
 import ListItem from '@mui/material/ListItem'; // Import des éléments de la liste
 import ListItemText from '@mui/material/ListItemText'; // Import du texte des éléments
+import Button from '@mui/material/Button'; // Import du bouton
 
 const Navbar: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // Initialisation du dispatch
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [themeDrawerOpen, setThemeDrawerOpen] = useState(false); // Renommer la variable d'état
+  const dispatch = useDispatch();
   const { avatar } = useAvatar();
-  const [notifications, setNotifications] = useState([
-    { id: 1, text: "Notification joueur 1", read: false },
-    { id: 2, text: "Notification système 1", read: true },
-    { id: 3, text: "Notification joueur 2", read: false },
-  ]); // Exemple de notifications
-  const [notificationModalOpen, setNotificationModalOpen] = useState(false);
-
+  const notifications = useSelector((state: RootState) => state.notifications.list); // Sélecteur pour les notifications
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [themeDrawerOpen, setThemeDrawerOpen] = useState(false);
+  const [notificationModalOpen, setNotificationModalOpen] = useState(false);
+
   const handleNotificationClick = (id: number) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+    dispatch(markNotificationAsRead(id)); // Marque une notification comme lue
   };
 
   const handleNotificationHover = (id: number) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+    dispatch(markNotificationAsRead(id)); // Marque une notification comme lue au survol
   };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -66,8 +60,12 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = () => {
-    dispatch(logout()); // Vider les données du store
-    navigate('/'); // Redirige vers la page d'accueil
+    dispatch(logout());
+    navigate('/');
+  };
+
+  const handleMarkAllAsRead = () => {
+    dispatch(markAllNotificationsAsRead()); // Marque toutes les notifications comme lues
   };
 
   return (
@@ -281,6 +279,14 @@ const Navbar: React.FC = () => {
               </ListItem>
             ))}
           </List>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleMarkAllAsRead}
+            sx={{ alignSelf: 'center', mb: 2 }}
+          >
+            Tout marquer comme lu
+          </Button>
         </Box>
       </Modal>
     </AppBar>
