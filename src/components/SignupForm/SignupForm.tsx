@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, IconButton, InputAdornment, Card, CardContent, Typography, Fab } from "@mui/material";
 import { Visibility, VisibilityOff, Mic } from "@mui/icons-material";
+import { registerUser } from "../../services/FetcherService";
 
 const SignupForm: React.FC = () => {
 	const [formData, setFormData] = useState({
@@ -36,21 +37,8 @@ const SignupForm: React.FC = () => {
 		setSuccessMessage(null);
 		if (!validateForm()) return;
 
-		const { pseudo, email, password } = formData;
-		const registrationData = { pseudo, email, password };
-
 		try {
-			const response = await fetch("https://streamaccess-dev-backend.codevert.org/auth/register", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(registrationData),
-			});
-
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.message || "Une erreur est survenue lors de l'inscription.");
-			}
-
+			await registerUser(formData);
 			setSuccessMessage("Votre demande a été envoyée avec succès et sera traitée par un administrateur.");
 			setFormData({ pseudo: "", email: "", password: "", confirmPassword: "" });
 		} catch (error) {

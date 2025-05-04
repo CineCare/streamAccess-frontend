@@ -1,33 +1,11 @@
-import { Palette } from "@mui/material";
 import { configureStore, createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage"; // Utilisation de localStorage
 import { persistReducer, persistStore } from "redux-persist";
 import { combineReducers } from "redux";
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
-
-// Types pour l'authentification
-interface AuthState {
-	isAuthenticated: boolean;
-}
-
-// Définition des types pour les catégories de préférences
-interface AccessibilityPreferences {
-	[category: string]: {
-		[option: string]: boolean | number | string;
-	};
-}
-
-// Types pour l'état des préférences d'accessibilité
-interface AccessibilityState {
-	preferences: AccessibilityPreferences;
-}
-
-// Définition des couleurs des catégories basées sur le thème de MUI
-interface AccessibilityColors {
-	[category: string]: keyof Palette; // On utilise les clés de la palette MUI
-}
-
-// État initial pour l'authentification (removed as it was unused)
+import { AuthState, AccessibilityState, AccessibilityColors, MoviesState, Comment } from "../types/interfaces";
+import { fetchAllMovies } from "../services/FetcherService";
+import { initialCommentsState, initialNotificationsState, initialTagsState } from "../data/mockData";
 
 // État initial pour les couleurs des catégories
 const initialColorsState: AccessibilityColors = {
@@ -164,24 +142,6 @@ const userSlice = createSlice({
 
 export const { setUserAvatar, setUserInfo } = userSlice.actions;
 
-// Slice pour les films
-export interface Movie {
-	id: number;
-	title: string;
-	releaseYear: number;
-	image?: string;
-	producerId?: number;
-	directorId?: number | null;
-	shortSynopsis?: string | null;
-	longSynopsis?: string | null;
-	teamComment?: string | null;
-	tags: string[];
-}
-
-interface MoviesState {
-	list: Movie[];
-}
-
 const initialMoviesState: MoviesState = {
 	list: [],
 };
@@ -189,17 +149,7 @@ const initialMoviesState: MoviesState = {
 // Thunk pour récupérer les films
 export const fetchMovies = createAsyncThunk("movies/fetchMovies", async (_, { rejectWithValue }) => {
 	try {
-		const token = localStorage.getItem("accessToken");
-		if (!token) throw new Error("Token manquant !");
-		const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
-			},
-		});
-		if (!response.ok) throw new Error(`Erreur : ${response.status} (${response.statusText})`);
-		return await response.json();
+		return await fetchAllMovies();
 	} catch (error) {
 		return rejectWithValue(error instanceof Error ? error.message : "Erreur inconnue");
 	}
@@ -218,6 +168,48 @@ const moviesSlice = createSlice({
 
 export const moviesReducer = moviesSlice.reducer;
 
+// Slice pour les notifications
+const notificationsSlice = createSlice({
+	name: "notifications",
+	initialState: initialNotificationsState,
+	reducers: {
+		markNotificationAsRead: (state, action: PayloadAction<number>) => {
+			const notification = state.list.find(n => n.id === action.payload);
+			if (notification) {
+				notification.read = true;
+			}
+		},
+		markAllNotificationsAsRead: state => {
+			state.list.forEach(notification => {
+				notification.read = true;
+			});
+		},
+	},
+});
+
+export const { markNotificationAsRead, markAllNotificationsAsRead } = notificationsSlice.actions;
+
+// Slice pour les commentaires
+const commentsSlice = createSlice({
+	name: "comments",
+	initialState: initialCommentsState,
+	reducers: {
+		addComment: (state, action: PayloadAction<Comment>) => {
+			state.list.unshift(action.payload);
+		},
+	},
+});
+
+export const { addComment } = commentsSlice.actions;
+
+const tagsSlice = createSlice({
+	name: "tags",
+	initialState: initialTagsState,
+	reducers: {},
+});
+
+export const tagsReducer = tagsSlice.reducer;
+
 // Combine reducers
 const rootReducer = combineReducers({
 	auth: persistReducer(authPersistConfig, authSlice.reducer),
@@ -225,6 +217,9 @@ const rootReducer = combineReducers({
 	accessibility: accessibilitySlice.reducer,
 	colors: colorsSlice.reducer,
 	movies: moviesReducer,
+	notifications: notificationsSlice.reducer,
+	comments: commentsSlice.reducer,
+	tags: tagsReducer,
 });
 
 // Configuration du store avec middleware pour ignorer les actions non sérialisables
@@ -245,4 +240,5 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 // Sélecteur pour récupérer les couleurs
 export const selectCategoryColors = (state: RootState) => state.colors;
+export const selectComments = (state: RootState) => state.comments.list;
 export default store;

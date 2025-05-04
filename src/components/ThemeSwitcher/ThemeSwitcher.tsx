@@ -8,20 +8,22 @@ import TextIncreaseIcon from "@mui/icons-material/TextIncrease"; // 🔠 Grand T
 import SpaIcon from "@mui/icons-material/Spa"; // 🌸 Mode Doux
 import WaterIcon from "@mui/icons-material/Water"; // 🌊 Thème Standard
 import Typography from "@mui/material/Typography";
+import { ThemeType } from "../../styles/ThemeContext";
+import { ThemeSwitcherProps } from "../../types/interfaces"; // Import des types d'interface
 
 // Ajout des props pour définir le layout et l'affichage des labels
-interface ThemeSwitcherProps {
-  layout?: "horizontal" | "vertical"; // Définit le style : horizontal ou vertical
-  showLabels?: boolean; // Affiche ou masque les labels
-}
 
-const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ layout = "horizontal", showLabels = true }) => {
+
+const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ layout = "horizontal", showLabels = true, onThemeChange }) => {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.accessibility.preferences.general.theme || "default");
 
   const handleThemeChange = (_: React.MouseEvent<HTMLElement>, newTheme: string) => {
     if (newTheme) {
       dispatch(setThemePreference(newTheme)); // Met à jour le thème dans le store
+      if (onThemeChange) {
+        onThemeChange(newTheme as ThemeType);
+      }
     }
   };
 
