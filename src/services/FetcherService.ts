@@ -2,7 +2,7 @@ import { ApiError, Movie } from "../types/interfaces";
 
 // Récupération des infos d'un film par ID
 export const fetchMovieById = async (id: number): Promise<Movie> => {
-	const token = localStorage.getItem("accessToken");
+	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
 	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${id}`, {
@@ -26,7 +26,7 @@ export const fetchMovieById = async (id: number): Promise<Movie> => {
 
 // Récupération de l'URL du flux vidéo
 export const fetchStreamUrl = async (): Promise<string> => {
-	const token = localStorage.getItem("accessToken");
+	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
 	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/streams/`, {
@@ -43,7 +43,7 @@ export const fetchStreamUrl = async (): Promise<string> => {
 
 // Création d'un film
 export const createMovie = async (formData: { title: string; description: string; releaseDate: string }): Promise<void> => {
-	const token = localStorage.getItem("accessToken");
+	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
 	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
@@ -152,7 +152,7 @@ export const fetchUserInfo = async (accessToken: string): Promise<{ pseudo: stri
 
 // Récupération de tous les films
 export const fetchAllMovies = async (): Promise<Movie[]> => {
-	const token = localStorage.getItem("accessToken");
+	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
 	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
