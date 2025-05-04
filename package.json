@@ -9,9 +9,9 @@
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "ci_lint": "eslint . -f checkstyle -o eslint.xml",
     "preview": "vite preview",
-    "test": "jest --config jest.config.ts",
-    "test:unit": "jest --config jest.config.ts --testPathPattern=unit",
-    "test:integration": "jest --config jest.config.ts --testPathPattern=integration"
+    "test": "vitest",
+    "test:unit": "vitest run --dir tests/unit",
+    "test:integration": "vitest run --dir tests/integration"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
+    "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^29.5.14",
     "@types/react": "^18.3.3",
@@ -55,6 +55,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "vite": "^5.3.4",
-    "vite-plugin-svgr": "^4.3.0"
+    "vite-plugin-svgr": "^4.3.0",
+    "vitest": "^3.1.2"
   }
 }
