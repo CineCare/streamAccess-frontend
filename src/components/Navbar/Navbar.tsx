@@ -90,6 +90,7 @@ const Navbar: React.FC = () => {
             color="inherit"
             onClick={() => setThemeDrawerOpen(true)} // Mettre à jour le nom de la fonction
             sx={{ marginRight: 2 }}
+            aria-label="Ouvrir le sélecteur de thème" // Ajout d'un label accessible
           >
             <PaletteIcon /> {/* Icône pour ouvrir la sélection des thèmes */}
           </IconButton>
@@ -106,7 +107,11 @@ const Navbar: React.FC = () => {
             </Badge>
           </IconButton>
           <IconButton color="inherit" onClick={handleMenuOpen}>
-            <Avatar src={avatar} alt="User Avatar">
+            <Avatar
+              src={avatar}
+              alt="Avatar utilisateur" // Assurez-vous que cet attribut correspond au texte attendu dans le test
+              data-testid="user-avatar" // Ajout d'un data-testid pour cibler l'élément dans les tests
+            >
               <AccountCircleIcon /> {/* S'affiche si pas d'avatar */}
             </Avatar>
           </IconButton>
@@ -181,6 +186,7 @@ const Navbar: React.FC = () => {
             <Divider sx={{ my: 1 }} /> {/* Séparateur */}
             <MenuItem
               onClick={handleLogout}
+              data-testid="logout-button" // Ajout d'un data-testid pour cibler cet élément dans les tests
               sx={{
                 display: "flex",
                 alignItems: "center",
