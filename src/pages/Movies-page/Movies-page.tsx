@@ -27,8 +27,8 @@ import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar.tsx";
-import { useSelector } from "react-redux";
-import { RootState } from "../../providers/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, fetchMovies, RootState } from "../../providers/store";
 import { Movie } from "../../types/interfaces";
 
 const tagIcons: { [key: string]: ReactElement } = {
@@ -51,12 +51,17 @@ const Movies = () => {
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
 	const [openModal, setOpenModal] = useState(false);
 	const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+	const dispatch = useDispatch<AppDispatch>();
 
 	useEffect(() => {
 		if (!openModal) {
 			setFlippedCard(null);
 		}
 	}, [openModal]);
+
+	useEffect(() => {
+    dispatch(fetchMovies()); // Charge les films dans le store après authentification
+  }, [dispatch]);
 
 	const filteredMovies = movies.filter(
 		movie =>

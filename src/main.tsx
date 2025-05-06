@@ -9,7 +9,6 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-	<React.StrictMode>
 		<Provider store={store}>
 			<PersistGate loading={null} persistor={persistor}>
 				<QueryClientProvider client={queryClient}>
@@ -17,5 +16,4 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 				</QueryClientProvider>
 			</PersistGate>
 		</Provider>
-	</React.StrictMode>
 );

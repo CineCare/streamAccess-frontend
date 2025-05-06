@@ -4,6 +4,15 @@ import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
 	plugins: [react(), svgr()],
+	server: {
+		proxy: {
+			"/events": {
+				target: "https://streamaccess-dev-backend.codevert.org/",
+				ws: true, // Active le proxy pour WebSocket
+				changeOrigin: true,
+			},
+		},
+	},
 	resolve: {
 		alias: {
 			"@components": "/src/components",
