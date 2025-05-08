@@ -12,6 +12,7 @@ import { AccessibilityThemeManager } from "./styles/AccessibilityThemeManager";
 import ContentManagement from "./pages/ContentManagement/ContentManagement";
 import EditMovie from "./pages/EditMovie/EditMovie";
 import AccessibilityOptionsPage from "./pages/AccessibilityOptionsPage";
+// import { useSocket } from "./hooks/useSocket";
 
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -25,6 +26,25 @@ const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
 };
 
 const App: React.FC = () => {
+  // const socket = useSocket();
+
+  // useEffect(() => {
+  //   if (socket) {
+  //     socket.on("connect", () => {
+  //       console.log("Connecté au serveur WebSocket");
+  //     });
+
+  //     socket.on("disconnect", () => {
+  //       console.log("Déconnecté du serveur WebSocket");
+  //     });
+
+  //     // Exemple : écoute d'un événement personnalisé
+  //     socket.on("message", (data) => {
+  //       console.log("Notification reçue :", data);
+  //     });
+  //   }
+  // }, [socket]);
+
   return (
     <AccessibilityThemeManager>
       <CssBaseline />
