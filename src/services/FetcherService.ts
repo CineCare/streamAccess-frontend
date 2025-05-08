@@ -57,6 +57,25 @@ export const createMovie = async (formData: { title: string; description: string
 
 	if (!response.ok) {
 		const errorData = await response.json();
+		throw new Error(errorData.message || "Erreur lors de la suppression du film.");
+	}
+};
+
+// Suppression d'un film
+export const deleteMovie = async (id: number): Promise<void> => {
+	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
+	if (!token) throw new Error("Token manquant !");
+
+	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${id}`, {
+		method: "DELETE",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
 		throw new Error(errorData.message || "Erreur lors de la création du film.");
 	}
 };
@@ -65,7 +84,6 @@ export const createMovie = async (formData: { title: string; description: string
 export const createMovieWithImage = async (formData: {
 	title: string;
 	releaseYear: string;
-	image: string;
 	producerId: string;
 	directorId: string;
 	shortSynopsis: string;
@@ -75,19 +93,21 @@ export const createMovieWithImage = async (formData: {
 	const token = localStorage.getItem("accessToken");
 	if (!token) throw new Error("Token manquant !");
 
+	const imageInput = (document.querySelector('input[name="image"]') as HTMLInputElement).files?.[0];
+
 	const formDataToSend = new FormData();
 	formDataToSend.append("title", formData.title);
 	formDataToSend.append("releaseYear", formData.releaseYear);
-	formDataToSend.append("image", (document.querySelector('input[name="image"]') as HTMLInputElement).files?.[0] || "");
+	if (imageInput) formDataToSend.append("image", (document.querySelector('input[name="image"]') as HTMLInputElement).files?.[0] || "");
 	if (formData.producerId) {
 		formDataToSend.append("producerId", formData.producerId);
 	}
 	if (formData.directorId) {
 		formDataToSend.append("directorId", formData.directorId);
 	}
-	formDataToSend.append("shortSynopsis", formData.shortSynopsis || "");
-	formDataToSend.append("longSynopsis", formData.longSynopsis || "");
-	formDataToSend.append("teamComment", formData.teamComment || "");
+	if (formData.shortSynopsis) formDataToSend.append("shortSynopsis", formData.shortSynopsis || "");
+	if (formData.longSynopsis) formDataToSend.append("longSynopsis", formData.longSynopsis || "");
+	if (formData.teamComment) formDataToSend.append("teamComment", formData.teamComment || "");
 
 	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
 		method: "POST",
@@ -99,6 +119,47 @@ export const createMovieWithImage = async (formData: {
 
 	if (!response.ok) {
 		throw new Error(`Erreur : ${response.status} (${response.statusText})`);
+	}
+};
+
+// Mise à jour d'un film
+export const updateMovie = async (
+	id: number,
+	formData: {
+		title?: string;
+		releaseYear?: string;
+		image?: File | null;
+		producerId?: string;
+		directorId?: string;
+		longSynopsis?: string;
+		shortSynopsis?: string;
+		teamComment?: string;
+	}
+): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const formDataToSend = new FormData();
+	if (formData.title) formDataToSend.append("title", formData.title);
+	if (formData.releaseYear) formDataToSend.append("releaseYear", formData.releaseYear);
+	if (formData.image) formDataToSend.append("image", formData.image);
+	if (formData.producerId) formDataToSend.append("producerId", formData.producerId);
+	if (formData.directorId) formDataToSend.append("directorId", formData.directorId);
+	if (formData.longSynopsis) formDataToSend.append("longSynopsis", formData.longSynopsis);
+	if (formData.shortSynopsis) formDataToSend.append("shortSynopsis", formData.shortSynopsis);
+	if (formData.teamComment) formDataToSend.append("teamComment", formData.teamComment);
+
+	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${id}`, {
+		method: "PUT",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+		body: formDataToSend,
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || "Erreur lors de la mise à jour du film.");
 	}
 };
 
@@ -168,4 +229,104 @@ export const fetchAllMovies = async (): Promise<Movie[]> => {
 	}
 
 	return response.json();
+};
+
+// Récupération de la liste des producteurs
+export const fetchProducers = async (): Promise<{ id: number; name: string }[]> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies/producers", {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error("Erreur lors de la récupération des producteurs.");
+	}
+
+	return response.json();
+};
+
+// Récupération de la liste des réalisateurs
+export const fetchDirectors = async (): Promise<{ id: number; name: string }[]> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies/directors", {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error("Erreur lors de la récupération des réalisateurs.");
+	}
+
+	return response.json();
+};
+
+// Création d'une personne (producteur ou réalisateur)
+export const createPerson = async (name: string, role: "producer" | "director"): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const endpoint = role === "producer" ? "producer" : "director";
+
+	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${endpoint}`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify({ name }),
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || `Erreur lors de la création du ${role}.`);
+	}
+};
+
+// Suppression d'une personne (producteur ou réalisateur)
+export const deletePerson = async (id: number, role: "producer" | "director"): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const endpoint = role === "producer" ? "producer" : "director";
+
+	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${endpoint}/${id}`, {
+		method: "DELETE",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || `Erreur lors de la suppression du ${role}.`);
+	}
+};
+
+// Mise à jour d'une personne (producteur ou réalisateur)
+export const updatePerson = async (id: number, name: string, biography: string, role: "producer" | "director"): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const endpoint = role === "producer" ? "producer" : "director";
+
+	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${endpoint}/${id}`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify({ name, biography }),
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || `Erreur lors de la mise à jour du ${role}.`);
+	}
 };

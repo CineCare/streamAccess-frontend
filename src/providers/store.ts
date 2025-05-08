@@ -158,13 +158,19 @@ export const fetchMovies = createAsyncThunk("movies/fetchMovies", async (_, { re
 const moviesSlice = createSlice({
 	name: "movies",
 	initialState: initialMoviesState,
-	reducers: {},
+	reducers: {
+		removeMovie: (state, action: PayloadAction<number>) => {
+			state.list = state.list.filter(movie => movie.id !== action.payload); // Supprime le film localement
+		},
+	},
 	extraReducers: builder => {
 		builder.addCase(fetchMovies.fulfilled, (state, action) => {
 			state.list = action.payload;
 		});
 	},
 });
+
+export const { removeMovie } = moviesSlice.actions; // Exporter l'action
 
 export const moviesReducer = moviesSlice.reducer;
 

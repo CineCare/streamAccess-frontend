@@ -1,28 +1,42 @@
 import React, { useState } from "react";
 import { Box, Typography, Button, MenuItem, TextField, ListItemText, IconButton, Popover, List } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../../providers/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, removeMovie } from "../../providers/store"; // Importer removeMovie
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { deleteMovie } from "../../services/FetcherService";
+import useFetchMovies from "../../hooks/useFetchMovies";
 
 const MovieManagement: React.FC = () => {
+	// Navigation et état global
 	const navigate = useNavigate();
-	const movies = useSelector((state: RootState) => state.movies.list); // Récupère la liste des films depuis le store
+	const dispatch = useDispatch();
+	const movies = useSelector((state: RootState) => state.movies.list);
+
+	// États locaux
 	const [searchQuery, setSearchQuery] = useState("");
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+	// Utilise le hook pour charger les films
+	useFetchMovies();
+
+	// Gestion des actions
 	const handleCreateMovie = () => {
-		navigate("/createmovie"); // Redirige vers la page de création de film
+		navigate("/createmovie");
 	};
 
 	const handleEditMovie = (id: number) => {
-		navigate(`/editmovie/${id}`); // Redirige vers la page de modification du film
+		navigate(`/editmovie/${id}`);
 	};
 
-	const handleDeleteMovie = (id: number) => {
-		// Logique de suppression (à implémenter)
-		console.log(`Supprimer le film avec l'ID : ${id}`);
+	const handleDeleteMovie = async (id: number) => {
+		try {
+			await deleteMovie(id); // Supprime le film via l'API
+			dispatch(removeMovie(id)); // Met à jour le store Redux
+		} catch (error) {
+			console.error("Erreur lors de la suppression du film :", error);
+		}
 	};
 
 	const handleOpenPopover = (event: React.MouseEvent<HTMLElement>) => {
@@ -33,13 +47,14 @@ const MovieManagement: React.FC = () => {
 		setAnchorEl(null);
 	};
 
-	const filteredMovies = searchQuery ? movies.filter(movie => movie.title.toLowerCase().includes(searchQuery.toLowerCase())) : movies; // Si la barre de recherche est vide, affiche tous les films
+	// Filtrage des films
+	const filteredMovies = searchQuery
+		? movies.filter(movie => movie.title.toLowerCase().includes(searchQuery.toLowerCase()))
+		: movies;
 
 	return (
 		<Box sx={{ padding: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1 }}>
-			<Typography
-				variant="h6"
-				sx={{ fontWeight: "bold", marginBottom: 2 }}>
+			<Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
 				Gestion des films
 			</Typography>
 			<Button
@@ -47,7 +62,8 @@ const MovieManagement: React.FC = () => {
 				color="primary"
 				fullWidth
 				sx={{ marginBottom: 2 }}
-				onClick={handleCreateMovie}>
+				onClick={handleCreateMovie}
+			>
 				Ajouter un film
 			</Button>
 			<Button
@@ -55,7 +71,8 @@ const MovieManagement: React.FC = () => {
 				color="primary"
 				fullWidth
 				onClick={handleOpenPopover}
-				sx={{ marginBottom: 2 }}>
+				sx={{ marginBottom: 2 }}
+			>
 				Sélectionner un film
 			</Button>
 			<Popover
@@ -72,10 +89,11 @@ const MovieManagement: React.FC = () => {
 				}}
 				PaperProps={{
 					style: {
-						maxHeight: 600, // Limite la hauteur du menu
-						width: anchorEl ? anchorEl.offsetWidth : "inherit", // Définit la largeur du Popover égale à celle du bouton
+						maxHeight: 600,
+						width: anchorEl ? anchorEl.offsetWidth : "inherit",
 					},
-				}}>
+				}}
+			>
 				<Box sx={{ padding: 2 }}>
 					<TextField
 						fullWidth
@@ -93,17 +111,20 @@ const MovieManagement: React.FC = () => {
 									display: "flex",
 									justifyContent: "space-between",
 									alignItems: "center",
-								}}>
+								}}
+							>
 								<ListItemText primary={movie.title} />
 								<Box>
 									<IconButton
 										color="primary"
-										onClick={() => handleEditMovie(movie.id)}>
+										onClick={() => handleEditMovie(movie.id)}
+									>
 										<EditIcon />
 									</IconButton>
 									<IconButton
 										color="error"
-										onClick={() => handleDeleteMovie(movie.id)}>
+										onClick={() => handleDeleteMovie(movie.id)}
+									>
 										<DeleteIcon />
 									</IconButton>
 								</Box>

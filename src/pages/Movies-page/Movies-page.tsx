@@ -19,6 +19,7 @@ import {
 	IconButton,
 	Pagination,
 	Button,
+	Divider,
 } from "@mui/material";
 import DvrIcon from "@mui/icons-material/Dvr";
 import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew";
@@ -27,9 +28,11 @@ import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar.tsx";
-import { useSelector } from "react-redux";
-import { RootState } from "../../providers/store";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, fetchMovies, AppDispatch } from "../../providers/store";
 import { Movie } from "../../types/interfaces";
+import useFetchMovies from "../../hooks/useFetchMovies";
+import { fetchProducers, fetchDirectors } from "../../services/FetcherService";
 
 const tagIcons: { [key: string]: ReactElement } = {
 	"Sous-titres disponibles": <SubtitlesIcon />,
@@ -51,6 +54,22 @@ const Movies = () => {
 	const [flippedCard, setFlippedCard] = useState<number | null>(null);
 	const [openModal, setOpenModal] = useState(false);
 	const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+	const [producers, setProducers] = useState<{ id: number; name: string }[]>([]);
+	const [directors, setDirectors] = useState<{ id: number; name: string }[]>([]);
+
+	// Fetch producers and directors on page load
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const [producersList, directorsList] = await Promise.all([fetchProducers(), fetchDirectors()]);
+				setProducers(producersList);
+				setDirectors(directorsList);
+			} catch (error) {
+				console.error("Erreur lors du chargement des producteurs et réalisateurs :", error);
+			}
+		};
+		fetchData();
+	}, []);
 
 	useEffect(() => {
 		if (!openModal) {
@@ -68,10 +87,23 @@ const Movies = () => {
 	const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
 	const paginatedMovies = filteredMovies.slice((currentPage - 1) * moviesPerPage, currentPage * moviesPerPage);
 
+	const handleOpenModal = (movie: Movie) => {
+		setSelectedMovie(movie);
+		setOpenModal(true);
+	};
+
 	const handleCloseModal = () => {
 		setOpenModal(false);
 		setSelectedMovie(null);
 	};
+
+	const dispatch = useDispatch<AppDispatch>();
+	
+	useEffect(() => {
+		dispatch(fetchMovies()); // Charge les films dans le store après authentification
+	}, [dispatch]);
+
+	useFetchMovies(); // Utilise le hook pour charger les films
 
 	return (
 		<Box>
@@ -256,6 +288,31 @@ const Movies = () => {
 														boxShadow: theme.shadows[4],
 														borderRadius: 2,
 													}}>
+													<Box>
+														<Typography
+															variant="h6"
+															sx={{ fontWeight: "bold", marginBottom: 1 }}>
+															{movie.title}
+														</Typography>
+														<Divider sx={{ marginBottom: 1 }} />
+														<Typography
+															variant="body2"
+															sx={{ marginBottom: 1 }}>
+															{movie.shortSynopsis || "Non disponible"}
+														</Typography>
+													</Box>
+													<Box
+														sx={{
+															marginTop: "auto",
+															paddingTop: 1,
+															borderTop: `1px solid ${theme.palette.divider}`,
+														}}>
+														<Typography
+															variant="body2"
+															sx={{ fontStyle: "italic", color: "gray" }}>
+															<strong>Commentaire :</strong> {movie.teamComment ? `${movie.teamComment.substring(0, 50)}...` : "Non disponible"}
+														</Typography>
+													</Box>
 													<IconButton
 														sx={{
 															position: "absolute",
@@ -267,93 +324,10 @@ const Movies = () => {
 														}}
 														onClick={e => {
 															e.stopPropagation();
-															setSelectedMovie(movie);
-															setOpenModal(true);
+															handleOpenModal(movie);
 														}}>
 														<ZoomOutMapIcon />
 													</IconButton>
-													<Box>
-														<Typography variant="h6">{movie.title}</Typography>
-														<Box
-															sx={{
-																overflow: "hidden",
-																display: "-webkit-box",
-																WebkitBoxOrient: "vertical",
-																WebkitLineClamp: flippedCard !== movie.id ? "unset" : "10",
-															}}>
-															<Typography variant="body2">{movie.longSynopsis || "Synopsis non disponible"}</Typography>
-														</Box>
-													</Box>
-													<Box>
-														<Typography variant="body2">{movie.teamComment || "Aucun commentaire de l'équipe"}</Typography>
-														<Button
-															variant="contained"
-															color="primary"
-															sx={{ marginTop: 2 }}
-															fullWidth
-															onClick={() => navigate(`/movie/${movie.id}`)}>
-															Voir le film
-														</Button>
-														<Dialog
-															open={openModal}
-															onClose={handleCloseModal}
-															maxWidth="md"
-															fullWidth
-															sx={{
-																"& .MuiBackdrop-root": {
-																	backgroundColor: alpha(theme.palette.background.default, 0.1),
-																},
-															}}>
-															{selectedMovie && (
-																<>
-																	<DialogTitle sx={{ backgroundColor: theme.palette.primary.main + "20" }}>{selectedMovie.title}</DialogTitle>
-																	<DialogContent dividers>
-																		<Grid
-																			container
-																			spacing={2}>
-																			{/* Affiche du film */}
-																			<Grid size={{ xs: 12, sm: 4 }}>
-																				<CardMedia
-																					component="img"
-																					sx={{ width: "100%", borderRadius: 1 }}
-																					image={selectedMovie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${selectedMovie.image}` : "/images/camera.png"}
-																					alt={`Affiche du film ${selectedMovie.title}`}
-																				/>
-																			</Grid>
-
-																			{/* Informations */}
-																			<Grid size={{ xs: 12, sm: 8 }}>
-																				<Typography
-																					variant="body1"
-																					sx={{ marginBottom: 1 }}>
-																					{selectedMovie.longSynopsis || "Synopsis non disponible"}
-																				</Typography>
-																				<Typography
-																					variant="body2"
-																					sx={{ fontStyle: "italic", color: "gray", marginBottom: 2 }}>
-																					{selectedMovie.teamComment || "Aucun commentaire de l'équipe"}
-																				</Typography>
-																			</Grid>
-																		</Grid>
-																	</DialogContent>
-
-																	<DialogActions>
-																		<Button
-																			onClick={() => setOpenModal(false)}
-																			color="secondary">
-																			Fermer
-																		</Button>
-																		<Button
-																			variant="contained"
-																			color="primary"
-																			onClick={() => navigate(`/movie/${selectedMovie.id}`)}>
-																			Voir le film
-																		</Button>
-																	</DialogActions>
-																</>
-															)}
-														</Dialog>
-													</Box>
 												</Card>
 											</Box>
 										</Box>
@@ -362,6 +336,92 @@ const Movies = () => {
 							})}
 						</Grid>
 					</Box>
+
+					{/* Modale */}
+					<Dialog
+						open={openModal}
+						onClose={handleCloseModal}
+						maxWidth="md"
+						fullWidth
+						sx={{
+							"& .MuiBackdrop-root": {
+								backgroundColor: alpha(theme.palette.background.default, 0.1),
+							},
+						}}>
+						{selectedMovie && (
+							<>
+								<DialogTitle sx={{ backgroundColor: theme.palette.primary.main + "20" }}>{selectedMovie.title}</DialogTitle>
+								<DialogContent dividers>
+									<Grid
+										container
+										spacing={2}>
+										{/* Affiche du film */}
+										<Grid size={{ xs: 12, sm: 4 }}>
+											<CardMedia
+												component="img"
+												sx={{ width: "100%", borderRadius: 1 }}
+												image={selectedMovie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${selectedMovie.image}` : "/images/camera.png"}
+												alt={`Affiche du film ${selectedMovie.title}`}
+											/>
+										</Grid>
+
+										{/* Informations */}
+										<Grid size={{ xs: 12, sm: 8 }} sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+											<Box>
+												<Typography
+													variant="body1"
+													sx={{ marginBottom: 1 }}>
+													<strong>Producteur :</strong> {producers.find(p => p.id === selectedMovie.producerId)?.name || "Non disponible"}
+												</Typography>
+												<Typography
+													variant="body1"
+													sx={{ marginBottom: 1 }}>
+													<strong>Réalisateur :</strong> {directors.find(d => d.id === selectedMovie.directorId)?.name || "Non disponible"}
+												</Typography>
+												<Typography
+													variant="body1"
+													sx={{ marginBottom: 1 }}>
+													<strong>Année :</strong> {selectedMovie.releaseYear || "Non disponible"}
+												</Typography>
+												<Divider sx={{ marginBottom: 1 }} />
+												<Typography
+													variant="body1"
+													sx={{ marginBottom: 2 }}>
+													{selectedMovie.longSynopsis || "Non disponible"}
+												</Typography>
+											</Box>
+											<Box
+												sx={{
+													marginTop: "auto",
+													paddingTop: 1,
+													borderTop: `1px solid ${theme.palette.divider}`,
+												}}>
+												<Typography
+													variant="body2"
+													sx={{ fontStyle: "italic", color: "gray" }}>
+													<strong>Commentaire de l'équipe :</strong> {selectedMovie.teamComment || "Non disponible"}
+												</Typography>
+											</Box>
+										</Grid>
+									</Grid>
+								</DialogContent>
+
+								<DialogActions>
+									<Button
+										variant="contained"
+										color="primary"
+										onClick={() => navigate(`/movie/${selectedMovie.id}`)}>
+										Voir le film
+									</Button>
+									<Button
+										onClick={handleCloseModal}
+										color="secondary">
+										Fermer
+									</Button>
+								</DialogActions>
+							</>
+						)}
+					</Dialog>
 
 					{/* Pagination */}
 					<Box sx={{ display: "flex", justifyContent: "center", marginTop: 3 }}>
