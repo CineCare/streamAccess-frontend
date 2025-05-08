@@ -266,3 +266,67 @@ export const fetchDirectors = async (): Promise<{ id: number; name: string }[]> 
 
 	return response.json();
 };
+
+// Création d'une personne (producteur ou réalisateur)
+export const createPerson = async (name: string, role: "producer" | "director"): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const endpoint = role === "producer" ? "producer" : "director";
+
+	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${endpoint}`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify({ name }),
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || `Erreur lors de la création du ${role}.`);
+	}
+};
+
+// Suppression d'une personne (producteur ou réalisateur)
+export const deletePerson = async (id: number, role: "producer" | "director"): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const endpoint = role === "producer" ? "producer" : "director";
+
+	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${endpoint}/${id}`, {
+		method: "DELETE",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || `Erreur lors de la suppression du ${role}.`);
+	}
+};
+
+// Mise à jour d'une personne (producteur ou réalisateur)
+export const updatePerson = async (id: number, name: string, biography: string, role: "producer" | "director"): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const endpoint = role === "producer" ? "producer" : "director";
+
+	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${endpoint}/${id}`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify({ name, biography }),
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || `Erreur lors de la mise à jour du ${role}.`);
+	}
+};
