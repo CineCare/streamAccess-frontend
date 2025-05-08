@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { CssBaseline } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "./providers/store";
@@ -12,39 +12,22 @@ import { AccessibilityThemeManager } from "./styles/AccessibilityThemeManager";
 import ContentManagement from "./pages/ContentManagement/ContentManagement";
 import EditMovie from "./pages/EditMovie/EditMovie";
 import AccessibilityOptionsPage from "./pages/AccessibilityOptionsPage";
+// import WSProvider from "./providers/WSProvider";
 // import { useSocket } from "./hooks/useSocket";
 
-const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
+const ProtectedRoute: React.FC = () => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const token = localStorage.getItem("accessToken");
 
   if (!isAuthenticated || !token) {
     return <Navigate to="/" replace state={{ from: location.pathname }} />;
   }
-
-  return children;
+  // Wrap Outlet in a WS Provider
+  // return <WSProvider><Outlet /></WSProvider>;
+  return <Outlet />;
 };
 
 const App: React.FC = () => {
-  // const socket = useSocket();
-
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("connect", () => {
-  //       console.log("Connecté au serveur WebSocket");
-  //     });
-
-  //     socket.on("disconnect", () => {
-  //       console.log("Déconnecté du serveur WebSocket");
-  //     });
-
-  //     // Exemple : écoute d'un événement personnalisé
-  //     socket.on("message", (data) => {
-  //       console.log("Notification reçue :", data);
-  //     });
-  //   }
-  // }, [socket]);
-
   return (
     <AccessibilityThemeManager>
       <CssBaseline />
@@ -55,63 +38,19 @@ const App: React.FC = () => {
         }}
       >
         <Routes>
+          {/* Route publique */}
           <Route path="/" element={<AuthPage />} />
-          <Route
-            path="/movies"
-            element={
-              <ProtectedRoute>
-                <MoviesPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/movie/:id"
-            element={
-              <ProtectedRoute>
-                <MoviePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/createmovie"
-            element={
-              <ProtectedRoute>
-                <CreateMovie />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/content-management"
-            element={
-              <ProtectedRoute>
-                <ContentManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/editmovie/:id"
-            element={
-              <ProtectedRoute>
-                <EditMovie />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/accessibility-options"
-            element={
-              <ProtectedRoute>
-                <AccessibilityOptionsPage />
-              </ProtectedRoute>
-            }
-          />
+
+          {/* Route protégée */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/movies" element={<MoviesPage />} />
+            <Route path="/movie/:id" element={<MoviePage />} />
+            <Route path="/createmovie" element={<CreateMovie />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/content-management" element={<ContentManagement />} />
+            <Route path="/editmovie/:id" element={<EditMovie />} />
+            <Route path="/accessibility-options" element={<AccessibilityOptionsPage />} />
+          </Route>
         </Routes>
       </Router>
     </AccessibilityThemeManager>
