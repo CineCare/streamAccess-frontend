@@ -1,11 +1,12 @@
 import { ApiError, Movie } from "../types/interfaces";
+const backendUrl = "https://streamaccess-dev-backend.codevert.org";
 
 // Récupération des infos d'un film par ID
 export const fetchMovieById = async (id: number): Promise<Movie> => {
 	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
-	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${id}`, {
+	const response = await fetch(`${backendUrl}/movies/${id}`, {
 		headers: {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
@@ -29,7 +30,7 @@ export const fetchStreamUrl = async (): Promise<string> => {
 	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
-	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/streams/`, {
+	const response = await fetch(`${backendUrl}/streams/`, {
 		headers: { Authorization: `Bearer ${token}` },
 	});
 
@@ -46,7 +47,7 @@ export const createMovie = async (formData: { title: string; description: string
 	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
-	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
+	const response = await fetch(`${backendUrl}/movies`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -66,7 +67,7 @@ export const deleteMovie = async (id: number): Promise<void> => {
 	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
-	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${id}`, {
+	const response = await fetch(`${backendUrl}/movies/${id}`, {
 		method: "DELETE",
 		headers: {
 			"Content-Type": "application/json",
@@ -109,7 +110,7 @@ export const createMovieWithImage = async (formData: {
 	if (formData.longSynopsis) formDataToSend.append("longSynopsis", formData.longSynopsis || "");
 	if (formData.teamComment) formDataToSend.append("teamComment", formData.teamComment || "");
 
-	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
+	const response = await fetch(`${backendUrl}/movies`, {
 		method: "POST",
 		headers: {
 			Authorization: `Bearer ${token}`,
@@ -149,7 +150,7 @@ export const updateMovie = async (
 	if (formData.shortSynopsis) formDataToSend.append("shortSynopsis", formData.shortSynopsis);
 	if (formData.teamComment) formDataToSend.append("teamComment", formData.teamComment);
 
-	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${id}`, {
+	const response = await fetch(`${backendUrl}/movies/${id}`, {
 		method: "PUT",
 		headers: {
 			Authorization: `Bearer ${token}`,
@@ -165,7 +166,7 @@ export const updateMovie = async (
 
 // Inscription d'un utilisateur
 export const registerUser = async (formData: { email: string; password: string; pseudo: string }): Promise<void> => {
-	const response = await fetch("https://streamaccess-dev-backend.codevert.org/auth/register", {
+	const response = await fetch(`${backendUrl}/auth/register`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(formData),
@@ -179,7 +180,7 @@ export const registerUser = async (formData: { email: string; password: string; 
 
 // Authentification d'un utilisateur
 export const authenticateUser = async (email: string, password: string): Promise<string> => {
-	const response = await fetch("https://streamaccess-dev-backend.codevert.org/auth/login", {
+	const response = await fetch(`${backendUrl}/auth/login`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ email, password }),
@@ -196,7 +197,7 @@ export const authenticateUser = async (email: string, password: string): Promise
 
 // Récupération des informations utilisateur
 export const fetchUserInfo = async (accessToken: string): Promise<{ pseudo: string; email: string }> => {
-	const response = await fetch("https://streamaccess-dev-backend.codevert.org/users/me", {
+	const response = await fetch(`${backendUrl}/users/me`, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
@@ -216,7 +217,7 @@ export const fetchAllMovies = async (): Promise<Movie[]> => {
 	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
-	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies", {
+	const response = await fetch(`${backendUrl}/movies`, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
@@ -236,7 +237,7 @@ export const fetchProducers = async (): Promise<{ id: number; name: string }[]> 
 	const token = localStorage.getItem("accessToken");
 	if (!token) throw new Error("Token manquant !");
 
-	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies/producers", {
+	const response = await fetch(`${backendUrl}/movies/producers`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
@@ -254,7 +255,7 @@ export const fetchDirectors = async (): Promise<{ id: number; name: string }[]> 
 	const token = localStorage.getItem("accessToken");
 	if (!token) throw new Error("Token manquant !");
 
-	const response = await fetch("https://streamaccess-dev-backend.codevert.org/movies/directors", {
+	const response = await fetch(`${backendUrl}/movies/directors`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
@@ -274,7 +275,7 @@ export const createPerson = async (name: string, role: "producer" | "director"):
 
 	const endpoint = role === "producer" ? "producer" : "director";
 
-	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${endpoint}`, {
+	const response = await fetch(`${backendUrl}/movies/${endpoint}`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -296,7 +297,7 @@ export const deletePerson = async (id: number, role: "producer" | "director"): P
 
 	const endpoint = role === "producer" ? "producer" : "director";
 
-	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${endpoint}/${id}`, {
+	const response = await fetch(`${backendUrl}/movies/${endpoint}/${id}`, {
 		method: "DELETE",
 		headers: {
 			Authorization: `Bearer ${token}`,
@@ -316,7 +317,7 @@ export const updatePerson = async (id: number, name: string, biography: string, 
 
 	const endpoint = role === "producer" ? "producer" : "director";
 
-	const response = await fetch(`https://streamaccess-dev-backend.codevert.org/movies/${endpoint}/${id}`, {
+	const response = await fetch(`${backendUrl}/movies/${endpoint}/${id}`, {
 		method: "PUT",
 		headers: {
 			"Content-Type": "application/json",
