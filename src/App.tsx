@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { CssBaseline } from "@mui/material";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, fetchMovies, AppDispatch } from "./providers/store";
+import { useSelector } from "react-redux";
+import { RootState } from "./providers/store";
 import AuthPage from "./pages/Auth-page/Auth-page";
 import MoviesPage from "./pages/Movies-page/Movies-page";
 import MoviePage from "./pages/Movie-page/Movie-page";
@@ -25,12 +25,6 @@ const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
 };
 
 const App: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-
-  useEffect(() => {
-    dispatch(fetchMovies()); // Charge les films dans le store après authentification
-  }, [dispatch]);
-
   return (
     <AccessibilityThemeManager>
       <CssBaseline />

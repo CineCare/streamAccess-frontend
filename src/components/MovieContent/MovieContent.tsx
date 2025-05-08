@@ -1,9 +1,15 @@
-import { Card, Box, Typography, CardMedia, Chip, Button } from "@mui/material";
+import { Card, Box, Typography, CardMedia, Chip, Button, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { Movie } from "../../types/interfaces";
 
-const MovieContent: React.FC<{ movie: Movie }> = ({ movie }) => {
+interface MovieContentProps {
+	movie: Movie;
+	producerName: string;
+	directorName: string;
+}
+
+const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, directorName }) => {
 	const theme = useTheme();
 
 	return (
@@ -60,16 +66,16 @@ const MovieContent: React.FC<{ movie: Movie }> = ({ movie }) => {
 							<Typography variant="body1">
 								<strong>Année :</strong> {movie.releaseYear}
 							</Typography>
-							{movie.producerId && (
-								<Typography variant="body1">
-									<strong>Producteur :</strong> {movie.producerId}
-								</Typography>
-							)}
-							{movie.directorId && (
-								<Typography variant="body1">
-									<strong>Réalisateur :</strong> {movie.directorId}
-								</Typography>
-							)}
+							<Typography variant="body1">
+								<strong>Producteur :</strong> {producerName}
+							</Typography>
+							<Typography variant="body1">
+								<strong>Réalisateur :</strong> {directorName}
+							</Typography>
+							<Divider sx={{ my: 1 }} />
+							<Typography variant="body1" sx={{ marginBottom: 2, fontStyle: "italic", color: "gray" }}>
+								<strong>Commentaire de l'équipe :</strong> {movie.teamComment || "Non disponible"}
+							</Typography>
 							{movie.tags && movie.tags.length > 0 && (
 								<Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 1 }}>
 									{movie.tags.map((tag, index) => (
