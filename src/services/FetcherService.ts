@@ -1,5 +1,6 @@
 import { ApiError, Movie } from "../types/interfaces";
-const backendUrl = "https://streamaccess-dev-backend.codevert.org";
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3100"; // Utilisation de la variable d'environnement
 
 // Récupération des infos d'un film par ID
 export const fetchMovieById = async (id: number): Promise<Movie> => {

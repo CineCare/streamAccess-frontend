@@ -12,6 +12,7 @@ import { AccessibilityThemeManager } from "./styles/AccessibilityThemeManager";
 import ContentManagement from "./pages/ContentManagement/ContentManagement";
 import EditMovie from "./pages/EditMovie/EditMovie";
 import AccessibilityOptionsPage from "./pages/AccessibilityOptionsPage";
+// import WSProvider from "./providers/WSProvider";
 // import { useSocket } from "./hooks/useSocket";
 
 const ProtectedRoute: React.FC = () => {
@@ -27,44 +28,6 @@ const ProtectedRoute: React.FC = () => {
 };
 
 const App: React.FC = () => {
-// const socket = useSocket();
-
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("connect", () => {
-  //       console.log("Connecté au serveur WebSocket");
-  //     });
-
-  //     socket.on("disconnect", () => {
-  //       console.log("Déconnecté du serveur WebSocket");
-  //     });
-
-  //     // Exemple : écoute d'un événement personnalisé
-  //     socket.on("message", (data) => {
-  //       console.log("Notification reçue :", data);
-  //     });
-  //   }
-  // }, [socket]);
-
-  // const socket = useSocket();
-
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("connect", () => {
-  //       console.log("Connecté au serveur WebSocket");
-  //     });
-
-  //     socket.on("disconnect", () => {
-  //       console.log("Déconnecté du serveur WebSocket");
-  //     });
-
-  //     // Exemple : écoute d'un événement personnalisé
-  //     socket.on("message", (data) => {
-  //       console.log("Notification reçue :", data);
-  //     });
-  //   }
-  // }, [socket]);
-
   return (
     <AccessibilityThemeManager>
       <CssBaseline />
@@ -77,6 +40,8 @@ const App: React.FC = () => {
         <Routes>
           {/* Route publique */}
           <Route path="/" element={<AuthPage />} />
+
+          {/* Route protégée */}
           <Route element={<ProtectedRoute />}>
             <Route path="/movies" element={<MoviesPage />} />
             <Route path="/movie/:id" element={<MoviePage />} />
