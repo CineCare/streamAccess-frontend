@@ -53,7 +53,7 @@ const MovieManagement: React.FC = () => {
 		: movies;
 
 	return (
-		<Box sx={{ padding: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1 }}>
+		<Box sx={{ padding: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1, height: "100%" }}>
 			<Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
 				Gestion des films
 			</Typography>
@@ -73,7 +73,7 @@ const MovieManagement: React.FC = () => {
 				onClick={handleOpenPopover}
 				sx={{ marginBottom: 2 }}
 			>
-				Sélectionner un film
+				Gérer les films
 			</Button>
 			<Popover
 				open={Boolean(anchorEl)}

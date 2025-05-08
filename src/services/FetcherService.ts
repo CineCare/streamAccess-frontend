@@ -165,6 +165,26 @@ export const updateMovie = async (
 	}
 };
 
+// Mise à jour des tags d'un film
+export const updateMovieTags = async (movieId: number, tagIds: number[]): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const response = await fetch(`${backendUrl}/movies/${movieId}/tags`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify({ tags: tagIds }),
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || "Erreur lors de la mise à jour des tags du film.");
+	}
+};
+
 // Inscription d'un utilisateur
 export const registerUser = async (formData: { email: string; password: string; pseudo: string }): Promise<void> => {
 	const response = await fetch(`${backendUrl}/auth/register`, {
@@ -330,5 +350,81 @@ export const updatePerson = async (id: number, name: string, biography: string, 
 	if (!response.ok) {
 		const errorData = await response.json();
 		throw new Error(errorData.message || `Erreur lors de la mise à jour du ${role}.`);
+	}
+};
+
+// Récupération de la liste des tags
+export const fetchTags = async (): Promise<{ id: number; label: string }[]> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const response = await fetch(`${backendUrl}/movies/tags`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error("Erreur lors de la récupération des tags.");
+	}
+
+	return response.json();
+};
+
+// Création d'un tag
+export const createTag = async (label: string): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const response = await fetch(`${backendUrl}/movies/tag`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify({ label }),
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || "Erreur lors de la création du tag.");
+	}
+};
+
+// Suppression d'un tag
+export const deleteTag = async (id: number): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const response = await fetch(`${backendUrl}/movies/tag/${id}`, {
+		method: "DELETE",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || "Erreur lors de la suppression du tag.");
+	}
+};
+
+// Mise à jour d'un tag
+export const updateTag = async (id: number, label: string): Promise<void> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const response = await fetch(`${backendUrl}/movies/tag/${id}`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify({ label }),
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.message || "Erreur lors de la mise à jour du tag.");
 	}
 };
