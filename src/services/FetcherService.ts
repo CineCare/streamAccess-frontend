@@ -44,7 +44,7 @@ export const fetchStreamUrl = async (): Promise<string> => {
 };
 
 // Création d'un film
-export const createMovie = async (formData: { title: string; description: string; releaseDate: string }): Promise<void> => {
+export const createMovie = async (formData: { title: string; description: string; releaseDate: string }): Promise<Movie> => {
 	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
 	if (!token) throw new Error("Token manquant !");
 
@@ -61,6 +61,8 @@ export const createMovie = async (formData: { title: string; description: string
 		const errorData = await response.json();
 		throw new Error(errorData.message || "Erreur lors de la suppression du film.");
 	}
+
+	return response.json();
 };
 
 // Suppression d'un film
@@ -91,25 +93,20 @@ export const createMovieWithImage = async (formData: {
 	shortSynopsis: string;
 	longSynopsis: string;
 	teamComment: string;
-}): Promise<void> => {
+	image?: File | null;
+}): Promise<Movie> => {
 	const token = localStorage.getItem("accessToken");
 	if (!token) throw new Error("Token manquant !");
-
-	const imageInput = (document.querySelector('input[name="image"]') as HTMLInputElement).files?.[0];
 
 	const formDataToSend = new FormData();
 	formDataToSend.append("title", formData.title);
 	formDataToSend.append("releaseYear", formData.releaseYear);
-	if (imageInput) formDataToSend.append("image", (document.querySelector('input[name="image"]') as HTMLInputElement).files?.[0] || "");
-	if (formData.producerId) {
-		formDataToSend.append("producerId", formData.producerId);
-	}
-	if (formData.directorId) {
-		formDataToSend.append("directorId", formData.directorId);
-	}
-	if (formData.shortSynopsis) formDataToSend.append("shortSynopsis", formData.shortSynopsis || "");
-	if (formData.longSynopsis) formDataToSend.append("longSynopsis", formData.longSynopsis || "");
-	if (formData.teamComment) formDataToSend.append("teamComment", formData.teamComment || "");
+	if (formData.producerId) formDataToSend.append("producerId", formData.producerId);
+	if (formData.directorId) formDataToSend.append("directorId", formData.directorId);
+	if (formData.shortSynopsis) formDataToSend.append("shortSynopsis", formData.shortSynopsis);
+	if (formData.longSynopsis) formDataToSend.append("longSynopsis", formData.longSynopsis);
+	if (formData.teamComment) formDataToSend.append("teamComment", formData.teamComment);
+	if (formData.image) formDataToSend.append("image", formData.image);
 
 	const response = await fetch(`${backendUrl}/movies`, {
 		method: "POST",
@@ -120,8 +117,11 @@ export const createMovieWithImage = async (formData: {
 	});
 
 	if (!response.ok) {
-		throw new Error(`Erreur : ${response.status} (${response.statusText})`);
+		const errorData = await response.json();
+		throw new Error(errorData.message || `Erreur : ${response.status} (${response.statusText})`);
 	}
+
+	return response.json(); // Retourne l'objet du film créé
 };
 
 // Mise à jour d'un film
@@ -171,18 +171,36 @@ export const updateMovieTags = async (movieId: number, tagIds: number[]): Promis
 	if (!token) throw new Error("Token manquant !");
 
 	const response = await fetch(`${backendUrl}/movies/${movieId}/tags`, {
-		method: "PUT",
+		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
 		},
-		body: JSON.stringify({ tags: tagIds }),
+		body: JSON.stringify(tagIds), 
 	});
 
 	if (!response.ok) {
 		const errorData = await response.json();
 		throw new Error(errorData.message || "Erreur lors de la mise à jour des tags du film.");
 	}
+};
+
+// Récupération des tags associés à un film
+export const fetchMovieTags = async (movieId: number): Promise<{ id: number; label: string }[]> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const response = await fetch(`${backendUrl}/movies/${movieId}/tags`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error("Erreur lors de la récupération des tags du film.");
+	}
+
+	return response.json();
 };
 
 // Inscription d'un utilisateur

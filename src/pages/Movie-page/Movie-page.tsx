@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar";
 import { Movie, ApiError } from "../../types/interfaces";
-import { fetchMovieById, fetchProducers, fetchDirectors } from "../../services/FetcherService";
+import { fetchMovieById, fetchProducers, fetchDirectors, fetchMovieTags } from "../../services/FetcherService";
 import CommentSection from "../../components/CommentSection/CommentSection";
 import VideoPlayer from "../../components/VideoPlayer/VideoPlayer";
 import useVideoStream from "../../hooks/useVideoStream";
@@ -25,6 +25,11 @@ const MoviePage = () => {
 	// Fetch producers and directors
 	const { data: producers } = useQuery("producers", fetchProducers);
 	const { data: directors } = useQuery("directors", fetchDirectors);
+
+	// Fetch tags associated with the movie
+	const { data: tags } = useQuery(["movieTags", id], () => fetchMovieTags(Number(id)), {
+		enabled: !!id,
+	});
 
 	// Get producer and director names
 	const producerName = producers?.find(p => p.id === movie?.producerId)?.name || "Inconnu";
@@ -79,7 +84,12 @@ const MoviePage = () => {
 				}}
 			>
 				{/* Movie Content */}
-				<MovieContent movie={movie} producerName={producerName} directorName={directorName} />
+				<MovieContent
+					movie={movie}
+					producerName={producerName}
+					directorName={directorName}
+					tags={tags || []} // Passe les tags associés au composant MovieContent
+				/>
 
 				{/* Video Player */}
 				<Box

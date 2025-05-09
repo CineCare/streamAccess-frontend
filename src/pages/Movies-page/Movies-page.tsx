@@ -22,10 +22,15 @@ import {
 	Divider,
 } from "@mui/material";
 import DvrIcon from "@mui/icons-material/Dvr";
-import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew";
 import SubtitlesIcon from "@mui/icons-material/Subtitles";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
+import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
+import WcIcon from '@mui/icons-material/Wc';
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
+import SmokingRoomsIcon from '@mui/icons-material/SmokingRooms';
+import ChurchIcon from '@mui/icons-material/Church';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar.tsx";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,9 +41,13 @@ import { fetchProducers, fetchDirectors } from "../../services/FetcherService";
 
 const tagIcons: { [key: string]: ReactElement } = {
 	"Sous-titres disponibles": <SubtitlesIcon />,
-	"Scènes violentes": <DvrIcon />,
-	Accessible: <AccessibilityNewIcon />,
 	"Audio description": <DvrIcon />,
+	"Scènes violentes": <SportsKabaddiIcon />,
+	"Sexe explicite": <WcIcon />,
+	"Anti stress": <SelfImprovementIcon />,
+	"Angoissant": <SentimentVeryDissatisfiedIcon />,
+	"Addiction": <SmokingRoomsIcon />,
+	"Deuil": <ChurchIcon />,
 };
 const moviesPerPage = 16;
 
@@ -386,7 +395,11 @@ const Movies = () => {
 												<Divider sx={{ marginBottom: 1 }} />
 												<Typography
 													variant="body1"
-													sx={{ marginBottom: 2 }}>
+													sx={{
+														marginBottom: 2,
+														whiteSpace: "pre-wrap", // Permet de conserver les retours à la ligne
+														wordWrap: "break-word", // Permet de couper les mots trop longs
+													}}>
 													{selectedMovie.longSynopsis || "Non disponible"}
 												</Typography>
 											</Box>

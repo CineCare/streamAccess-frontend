@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, TextField, Typography, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Grid } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar";
-import { createMovieWithImage, fetchProducers, fetchDirectors } from "../../services/FetcherService";
+import { createMovieWithImage, fetchProducers, fetchDirectors, fetchTags, updateMovieTags } from "../../services/FetcherService";
 
 const CreateMovie: React.FC = () => {
 	const [formData, setFormData] = useState({
@@ -17,16 +17,23 @@ const CreateMovie: React.FC = () => {
 
 	const [producers, setProducers] = useState<{ id: number; name: string }[]>([]);
 	const [directors, setDirectors] = useState<{ id: number; name: string }[]>([]);
+	const [tags, setTags] = useState<{ id: number; label: string }[]>([]);
+	const [selectedTags, setSelectedTags] = useState<string[]>([]); // Stocke les labels des tags sélectionnés
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState(false);
 
-	// Récupère les listes des producteurs et réalisateurs
+	// Récupère les listes des producteurs, réalisateurs et tags
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const [producersList, directorsList] = await Promise.all([fetchProducers(), fetchDirectors()]);
+				const [producersList, directorsList, tagsList] = await Promise.all([
+					fetchProducers(),
+					fetchDirectors(),
+					fetchTags(), // Récupère les tags disponibles
+				]);
 				setProducers(producersList);
 				setDirectors(directorsList);
+				setTags(tagsList);
 			} catch (err) {
 				if (err instanceof Error) {
 					setError(err.message);
@@ -61,6 +68,11 @@ const CreateMovie: React.FC = () => {
 		});
 	};
 
+	const handleTagChange = (e: SelectChangeEvent<string[]>) => {
+		const value = e.target.value as string[];
+		setSelectedTags(value); // Stocke les labels des tags sélectionnés
+	};
+
 	// Libération de l'URL après utilisation
 	useEffect(() => {
 		let objectUrl: string | undefined;
@@ -81,8 +93,16 @@ const CreateMovie: React.FC = () => {
 		setSuccess(false);
 
 		try {
-			await createMovieWithImage(formData);
-			setSuccess(true);
+				// Création du film
+				const createdMovie = await createMovieWithImage(formData);
+				// Mise à jour des tags après la création du film
+				if (selectedTags.length > 0) {
+					const tagIds = selectedTags.map(tag => tags.find(t => t.label === tag)?.id || 0); // Convertit les labels en IDs
+					console.log(createdMovie.id, tagIds); // Vérification des IDs
+					await updateMovieTags(createdMovie.id, tagIds); // Utilise l'ID du film créé pour associer les tags
+				}
+
+			// Réinitialisation des champs du formulaire
 			setFormData({
 				title: "",
 				releaseYear: "",
@@ -91,8 +111,10 @@ const CreateMovie: React.FC = () => {
 				directorId: "",
 				shortSynopsis: "",
 				longSynopsis: "",
-				teamComment: "",
+				teamComment: ""
 			});
+			setSelectedTags([]);
+			setSuccess(true);
 		} catch (error) {
 			if (error instanceof Error) {
 				setError(error.message);
@@ -242,6 +264,34 @@ const CreateMovie: React.FC = () => {
 											rows={3}
 											sx={{ marginBottom: 3 }}
 										/>
+									</Grid>
+
+								{/* Section Tags */}
+									<Grid size={{ xs: 12, md: 6 }}>
+										<Typography
+											variant="h6"
+											sx={{ fontWeight: "bold", marginBottom: 2 }}>
+											Tags
+										</Typography>
+										<FormControl
+											fullWidth
+											sx={{ marginBottom: 3 }}>
+											<InputLabel>Tags</InputLabel>
+											<Select
+												multiple
+												name="tags"
+												value={selectedTags} // Affiche les labels des tags sélectionnés
+												onChange={handleTagChange}
+												renderValue={selected => selected.join(", ")}>
+												{tags.map(tag => (
+													<MenuItem
+														key={tag.id}
+														value={tag.label}>
+														{tag.label}
+													</MenuItem>
+												))}
+											</Select>
+										</FormControl>
 									</Grid>
 							</Grid>
 

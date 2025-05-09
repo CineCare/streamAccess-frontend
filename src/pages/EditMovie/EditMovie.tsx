@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Typography, TextField, Button, CircularProgress, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Grid } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar";
-import { fetchMovieById, updateMovie, fetchProducers, fetchDirectors, fetchTags, updateMovieTags } from "../../services/FetcherService";
+import { fetchMovieById, updateMovie, fetchProducers, fetchDirectors, fetchTags, updateMovieTags, fetchMovieTags } from "../../services/FetcherService";
 import { Movie } from "../../types/interfaces";
 
 const EditMovie: React.FC = () => {
@@ -20,7 +20,7 @@ const EditMovie: React.FC = () => {
 	const [producers, setProducers] = useState<{ id: number; name: string }[]>([]);
 	const [directors, setDirectors] = useState<{ id: number; name: string }[]>([]);
 	const [tags, setTags] = useState<{ id: number; label: string }[]>([]);
-	const [selectedTags, setSelectedTags] = useState<number[]>([]);
+	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [fetching, setFetching] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,13 @@ const EditMovie: React.FC = () => {
 		const fetchData = async () => {
 			if (!id) return;
 			try {
-				const [movie, producersList, directorsList, tagsList] = await Promise.all([fetchMovieById(Number(id)), fetchProducers(), fetchDirectors(), fetchTags()]);
+				const [movie, producersList, directorsList, tagsList, movieTags] = await Promise.all([
+					fetchMovieById(Number(id)),
+					fetchProducers(),
+					fetchDirectors(),
+					fetchTags(),
+					fetchMovieTags(Number(id)), // Récupère les tags associés au film
+				]);
 
 				setFormData({
 					title: movie.title || "",
@@ -47,7 +53,7 @@ const EditMovie: React.FC = () => {
 				setProducers(producersList);
 				setDirectors(directorsList);
 				setTags(tagsList);
-				setSelectedTags((movie.tags || []).map(Number)); // Convertit les tags en nombres
+				setSelectedTags(movieTags.map(tag => tag.label)); // Stocke les labels des tags associés
 				setMovie(movie); // Stocke les données du film dans l'état
 			} catch {
 				setError("Erreur lors du chargement des données.");
@@ -102,7 +108,7 @@ const EditMovie: React.FC = () => {
 	// Gestion des changements pour les tags sélectionnés
 	const handleTagChange = (e: SelectChangeEvent<string[]>) => {
 		const value = e.target.value as string[];
-		setSelectedTags(value.map(Number)); // Conversion explicite des chaînes en nombres
+		setSelectedTags(value); // Conversion explicite des chaînes en nombres
 	};
 
 	// Enregistrement des modifications, y compris les tags
@@ -117,7 +123,7 @@ const EditMovie: React.FC = () => {
 
 			// Mise à jour des tags uniquement si des tags sont sélectionnés
 			if (selectedTags.length > 0) {
-				await updateMovieTags(Number(id), selectedTags);
+				await updateMovieTags(Number(id), selectedTags.map(tag => tags.find(t => t.label === tag)?.id || 0));
 			}
 
 			setSuccess(true);
@@ -256,7 +262,7 @@ const EditMovie: React.FC = () => {
 							<Typography
 								variant="body1"
 								sx={{ marginBottom: 1 }}>
-								Uploader une nouvelle image :
+								Charger une nouvelle image :
 							</Typography>
 							<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
 								<input
@@ -305,7 +311,7 @@ const EditMovie: React.FC = () => {
 							<Typography
 								variant="h6"
 								sx={{ fontWeight: "bold", marginBottom: 2 }}>
-								Tags (facultatif)
+								Tags
 							</Typography>
 							<FormControl
 								fullWidth
@@ -314,13 +320,13 @@ const EditMovie: React.FC = () => {
 								<Select
 									multiple
 									name="tags"
-									value={selectedTags.map(tagId => tagId.toString())} // Conversion des nombres en chaînes pour l'affichage
+									value={selectedTags} // Affiche les labels des tags associés
 									onChange={handleTagChange}
-									renderValue={selected => selected.map(tagId => tags.find(tag => tag.id === parseInt(tagId, 10))?.label).join(", ")}>
+									renderValue={selected => selected.join(", ")}>
 									{tags.map(tag => (
 										<MenuItem
 											key={tag.id}
-											value={tag.id.toString()}>
+											value={tag.label}>
 											{tag.label}
 										</MenuItem>
 									))}

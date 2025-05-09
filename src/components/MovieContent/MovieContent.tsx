@@ -3,13 +3,16 @@ import { useTheme } from "@mui/material/styles";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { Movie } from "../../types/interfaces";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3100"; // Utilisation de la variable d'environnement
+
 interface MovieContentProps {
 	movie: Movie;
 	producerName: string;
 	directorName: string;
+	tags: { id: number; label: string }[]; // Ajout des tags associés
 }
 
-const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, directorName }) => {
+const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, directorName, tags }) => {
 	const theme = useTheme();
 
 	return (
@@ -56,7 +59,7 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 							borderRadius: 1,
 							backgroundColor: "black",
 						}}
-						image={movie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` : "/images/camera.png"}
+						image={movie.image ? `${backendUrl}/assets/movies_images/${movie.image}` : "/images/camera.png"}
 						alt={`Affiche du film ${movie.title}`}
 					/>
 
@@ -72,22 +75,22 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 							<Typography variant="body1">
 								<strong>Réalisateur :</strong> {directorName}
 							</Typography>
-							<Divider sx={{ my: 1 }} />
-							<Typography variant="body1" sx={{ marginBottom: 2, fontStyle: "italic", color: "gray" }}>
-								<strong>Commentaire de l'équipe :</strong> {movie.teamComment || "Non disponible"}
-							</Typography>
-							{movie.tags && movie.tags.length > 0 && (
+							{tags.length > 0 && (
 								<Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 1 }}>
-									{movie.tags.map((tag, index) => (
+									{tags.map(tag => (
 										<Chip
-											key={index}
-											label={tag}
+											key={tag.id}
+											label={tag.label}
 											size="small"
 											sx={{ backgroundColor: theme.palette.primary.main + "20" }}
 										/>
 									))}
 								</Box>
 							)}
+							<Divider sx={{ my: 1 }} />
+							<Typography variant="body1" sx={{ marginBottom: 2, fontStyle: "italic", color: "gray" }}>
+								<strong>Commentaire de l'équipe :</strong> {movie.teamComment || "Non disponible"}
+							</Typography>
 						</Box>
 					</Box>
 				</Box>
@@ -102,7 +105,11 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 					<Typography
 						variant="body1"
 						paragraph
-						sx={{ color: "text.secondary" }}>
+						sx={{
+							color: "text.secondary",
+							whiteSpace: "pre-wrap", // Permet de conserver les retours à la ligne
+							wordWrap: "break-word", // Permet de couper les mots trop longs
+						}}>
 						{movie.longSynopsis || "Aucun synopsis disponible."}
 					</Typography>
 				</Box>
