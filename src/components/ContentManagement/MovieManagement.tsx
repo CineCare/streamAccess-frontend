@@ -53,86 +53,91 @@ const MovieManagement: React.FC = () => {
 		: movies;
 
 	return (
-		<Box sx={{ padding: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1 }}>
+		<Box sx={{ padding: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
 			<Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
 				Gestion des films
 			</Typography>
-			<Button
-				variant="contained"
-				color="primary"
-				fullWidth
-				sx={{ marginBottom: 2 }}
-				onClick={handleCreateMovie}
-			>
-				Ajouter un film
-			</Button>
-			<Button
-				variant="outlined"
-				color="primary"
-				fullWidth
-				onClick={handleOpenPopover}
-				sx={{ marginBottom: 2 }}
-			>
-				Sélectionner un film
-			</Button>
-			<Popover
-				open={Boolean(anchorEl)}
-				anchorEl={anchorEl}
-				onClose={handleClosePopover}
-				anchorOrigin={{
-					vertical: "bottom",
-					horizontal: "left",
-				}}
-				transformOrigin={{
-					vertical: "top",
-					horizontal: "left",
-				}}
-				PaperProps={{
-					style: {
-						maxHeight: 600,
-						width: anchorEl ? anchorEl.offsetWidth : "inherit",
-					},
-				}}
-			>
-				<Box sx={{ padding: 2 }}>
-					<TextField
-						fullWidth
-						variant="outlined"
-						placeholder="Rechercher un film"
-						value={searchQuery}
-						onChange={e => setSearchQuery(e.target.value)}
-						sx={{ marginBottom: 2 }}
-					/>
-					<List>
-						{filteredMovies.map(movie => (
-							<MenuItem
-								key={movie.id}
-								sx={{
-									display: "flex",
-									justifyContent: "space-between",
-									alignItems: "center",
-								}}
-							>
-								<ListItemText primary={movie.title} />
-								<Box>
-									<IconButton
-										color="primary"
-										onClick={() => handleEditMovie(movie.id)}
-									>
-										<EditIcon />
-									</IconButton>
-									<IconButton
-										color="error"
-										onClick={() => handleDeleteMovie(movie.id)}
-									>
-										<DeleteIcon />
-									</IconButton>
-								</Box>
-							</MenuItem>
-						))}
-					</List>
-				</Box>
-			</Popover>
+			<Typography variant="body1" sx={{ marginBottom: 2 }}>
+				Nombre total de films : {movies.length}
+			</Typography>
+			<Box>
+				<Button
+					variant="contained"
+					color="primary"
+					fullWidth
+					sx={{ marginBottom: 2 }}
+					onClick={handleCreateMovie}
+				>
+					Ajouter un film
+				</Button>
+				<Button
+					variant="outlined"
+					color="primary"
+					fullWidth
+					onClick={handleOpenPopover}
+					sx={{ marginBottom: 2 }}
+				>
+					Gérer les films
+				</Button>
+				<Popover
+					open={Boolean(anchorEl)}
+					anchorEl={anchorEl}
+					onClose={handleClosePopover}
+					anchorOrigin={{
+						vertical: "bottom",
+						horizontal: "left",
+					}}
+					transformOrigin={{
+						vertical: "top",
+						horizontal: "left",
+					}}
+					PaperProps={{
+						style: {
+							maxHeight: 600,
+							width: anchorEl ? anchorEl.offsetWidth : "inherit",
+						},
+					}}
+				>
+					<Box sx={{ padding: 2 }}>
+						<TextField
+							fullWidth
+							variant="outlined"
+							placeholder="Rechercher un film"
+							value={searchQuery}
+							onChange={e => setSearchQuery(e.target.value)}
+							sx={{ marginBottom: 2 }}
+						/>
+						<List>
+							{filteredMovies.map(movie => (
+								<MenuItem
+									key={movie.id}
+									sx={{
+										display: "flex",
+										justifyContent: "space-between",
+										alignItems: "center",
+									}}
+								>
+									<ListItemText primary={movie.title} />
+									<Box>
+										<IconButton
+											color="primary"
+											onClick={() => handleEditMovie(movie.id)}
+										>
+											<EditIcon />
+										</IconButton>
+										<IconButton
+											color="error"
+											onClick={() => handleDeleteMovie(movie.id)}
+										>
+											<DeleteIcon />
+										</IconButton>
+									</Box>
+								</MenuItem>
+							))}
+						</List>
+					</Box>
+				</Popover>
+			</Box>
 		</Box>
 	);
 };

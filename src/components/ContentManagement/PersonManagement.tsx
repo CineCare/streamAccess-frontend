@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, TextField, MenuItem, Select, FormControl, InputLabel, List, ListItem, IconButton, Popover, Dialog, DialogTitle, DialogContent, DialogActions, SelectChangeEvent } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { fetchProducers, fetchDirectors, createPerson, deletePerson, updatePerson } from "../../services/FetcherService";
+import { fetchProducers, fetchDirectors, createPerson, deletePerson, updatePerson, fetchTags, } from "../../services/FetcherService";
 
 const PersonManagement: React.FC = () => {
 	const [producers, setProducers] = useState<{ id: number; name: string; biography?: string }[]>([]);
@@ -14,11 +14,11 @@ const PersonManagement: React.FC = () => {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-	// Fetch producers and directors on load
+	// Fetch producers, directors, and tags on load
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const [producersList, directorsList] = await Promise.all([fetchProducers(), fetchDirectors()]);
+				const [producersList, directorsList] = await Promise.all([fetchProducers(), fetchDirectors(), fetchTags()]);
 				setProducers(producersList);
 				setDirectors(directorsList);
 			} catch {
