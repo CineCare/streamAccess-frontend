@@ -93,6 +93,7 @@ export const createMovieWithImage = async (formData: {
 	shortSynopsis: string;
 	longSynopsis: string;
 	teamComment: string;
+	history: string;
 	image?: File | null;
 }): Promise<Movie> => {
 	const token = localStorage.getItem("accessToken");
@@ -106,6 +107,7 @@ export const createMovieWithImage = async (formData: {
 	if (formData.shortSynopsis) formDataToSend.append("shortSynopsis", formData.shortSynopsis);
 	if (formData.longSynopsis) formDataToSend.append("longSynopsis", formData.longSynopsis);
 	if (formData.teamComment) formDataToSend.append("teamComment", formData.teamComment);
+	if (formData.history) formDataToSend.append("history", formData.history);
 	if (formData.image) formDataToSend.append("image", formData.image);
 
 	const response = await fetch(`${backendUrl}/movies`, {
