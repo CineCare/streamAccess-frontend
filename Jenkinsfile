@@ -57,6 +57,10 @@ pipeline {
         stage('build') {
             steps {
                 echo 'performing build'
+                //copy .env file from jenkins credentials to current workspace
+                withCredentials([file(credentialsId: "front_env_dev", variable: 'envFile')]){
+                    sh 'cp $envFile $WORKSPACE'
+                }
                 sh '''
                     npm run build
                 '''
@@ -68,11 +72,6 @@ pipeline {
                 expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'dev'}
             }
             steps {
-                //copy .env file from jenkins credentials to current workspace
-                withCredentials([file(credentialsId: "front_env_dev", variable: 'envFile')]){
-                    sh 'cp $envFile $WORKSPACE'
-                }
-                
                 //connect to docker hub, build image and push to registry
                 sh '''
                     echo $DOCKER_CREDENTIALS_PSW | docker login localhost:5000 -u $DOCKER_CREDENTIALS_USR --password-stdin
