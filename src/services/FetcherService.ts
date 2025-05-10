@@ -178,7 +178,7 @@ export const updateMovieTags = async (movieId: number, tagIds: number[]): Promis
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
 		},
-		body: JSON.stringify(tagIds), 
+		body: JSON.stringify(tagIds),
 	});
 
 	if (!response.ok) {
@@ -203,6 +203,17 @@ export const fetchMovieTags = async (movieId: number): Promise<{ id: number; lab
 	}
 
 	return response.json();
+};
+
+// Récupération des commentaires d'un film (mock depuis le front)
+export const fetchMovieComments = async (movieId: number): Promise<Comment[]> => {
+	// On charge le fichier JSON local (public/comments.json)
+	const response = await fetch("/mockupComments.json");
+	if (!response.ok) {
+		throw new Error("Erreur lors de la récupération des commentaires mock.");
+	}
+	const allComments: Record<string, Comment[]> = await response.json();
+	return allComments[String(movieId)] || [];
 };
 
 // Inscription d'un utilisateur

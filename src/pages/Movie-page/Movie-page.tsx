@@ -116,7 +116,7 @@ const MoviePage = () => {
 				</Box>
 
 				{/* Comment Section */}
-				<CommentSection />
+				<CommentSection movieId={movie.id} />
 			</Box>
 		</>
 	);
