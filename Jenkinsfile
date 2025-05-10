@@ -69,7 +69,7 @@ pipeline {
             }
             steps {
                 //copy .env file from jenkins credentials to current workspace
-                withCredentials([file(credentialsId: "dev_env", variable: 'envFile')]){
+                withCredentials([file(credentialsId: "front_env_dev", variable: 'envFile')]){
                     sh 'cp $envFile $WORKSPACE'
                 }
                 
