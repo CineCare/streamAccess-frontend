@@ -93,6 +93,7 @@ export const createMovieWithImage = async (formData: {
 	shortSynopsis: string;
 	longSynopsis: string;
 	teamComment: string;
+	history: string;
 	image?: File | null;
 }): Promise<Movie> => {
 	const token = localStorage.getItem("accessToken");
@@ -106,6 +107,7 @@ export const createMovieWithImage = async (formData: {
 	if (formData.shortSynopsis) formDataToSend.append("shortSynopsis", formData.shortSynopsis);
 	if (formData.longSynopsis) formDataToSend.append("longSynopsis", formData.longSynopsis);
 	if (formData.teamComment) formDataToSend.append("teamComment", formData.teamComment);
+	if (formData.history) formDataToSend.append("history", formData.history);
 	if (formData.image) formDataToSend.append("image", formData.image);
 
 	const response = await fetch(`${backendUrl}/movies`, {
@@ -176,7 +178,7 @@ export const updateMovieTags = async (movieId: number, tagIds: number[]): Promis
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
 		},
-		body: JSON.stringify(tagIds), 
+		body: JSON.stringify(tagIds),
 	});
 
 	if (!response.ok) {
@@ -201,6 +203,17 @@ export const fetchMovieTags = async (movieId: number): Promise<{ id: number; lab
 	}
 
 	return response.json();
+};
+
+// Récupération des commentaires d'un film (mock depuis le front)
+export const fetchMovieComments = async (movieId: number): Promise<Comment[]> => {
+	// On charge le fichier JSON local (public/comments.json)
+	const response = await fetch("/mockupComments.json");
+	if (!response.ok) {
+		throw new Error("Erreur lors de la récupération des commentaires mock.");
+	}
+	const allComments: Record<string, Comment[]> = await response.json();
+	return allComments[String(movieId)] || [];
 };
 
 // Inscription d'un utilisateur

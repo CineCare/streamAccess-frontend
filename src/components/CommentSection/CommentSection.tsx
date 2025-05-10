@@ -1,31 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography, IconButton, Collapse, TextField, Button, Avatar } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import SendIcon from "@mui/icons-material/Send";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../providers/store";
-import { addComment, selectComments } from "../../providers/store";
-import { Comment } from "../../types/interfaces";
+import type { Comment as MovieComment } from "../../types/interfaces";
 import { useAvatar } from "../../hooks/useAvatar";
+import { fetchMovieComments } from "../../services/FetcherService";
 
-const CommentSection: React.FC = () => {
+interface CommentSectionProps {
+	movieId?: number;
+}
+
+const CommentSection: React.FC<CommentSectionProps> = ({ movieId }) => {
 	const [newComment, setNewComment] = useState("");
 	const [isExpanded, setIsExpanded] = useState(false);
 	const theme = useTheme();
-	const dispatch = useDispatch();
-	const comments = useSelector(selectComments);
 	const { avatar } = useAvatar();
 	const userName = useSelector((state: RootState) => state.user.name);
+	const [movieComments, setMovieComments] = useState<MovieComment[]>([]);
+
+	useEffect(() => {
+		if (!movieId) return;
+		fetchMovieComments(movieId)
+			.then((comments: unknown) => setMovieComments(comments as MovieComment[]))
+			.catch(() => setMovieComments([]));
+	}, [movieId]);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!newComment.trim()) return;
 
-		// Création d'un nouveau commentaire
-		const newCommentObject: Comment = {
-			id: Date.now(), // Utilisation de l'horodatage comme ID unique
+		const newCommentObject: MovieComment = {
+			id: Date.now(),
 			userId: 999,
 			userName: userName || "Utilisateur",
 			userAvatar: avatar || undefined,
@@ -33,7 +42,10 @@ const CommentSection: React.FC = () => {
 			createdAt: new Date().toISOString(),
 		};
 
-		dispatch(addComment(newCommentObject)); // Ajout au store
+		// --- TEMP MOCKUP: ajout local, à remplacer par appel API quand dispo ---
+		setMovieComments(prev => [newCommentObject, ...prev]);
+		// --- FIN TEMP MOCKUP ---
+
 		setNewComment("");
 		setIsExpanded(true);
 	};
@@ -60,7 +72,7 @@ const CommentSection: React.FC = () => {
 				}}
 			>
 				<Typography variant="h6">
-					Commentaires ({comments.length})
+					Commentaires ({movieComments.length})
 				</Typography>
 				<IconButton size="small">
 					{isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -112,34 +124,34 @@ const CommentSection: React.FC = () => {
 
 					{/* Liste des commentaires */}
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-						{comments.map(comment => (
-							<Box key={comment.id} sx={{ 
-								display: 'flex', 
-								gap: 1,
-								p: 1,
-								backgroundColor: theme.palette.background.default,
-								borderRadius: 1
-							}}>
-								<Avatar 
-									src={comment.userAvatar}
-									alt={comment.userName}
-									sx={{ width: 32, height: 32 }}
-								/>
-								<Box sx={{ flex: 1 }}>
-									<Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-										<Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: "0.9rem" }}>
-											{comment.userName}
-										</Typography>
-										<Typography variant="caption" color="text.secondary">
-											{new Date(comment.createdAt).toLocaleDateString()}
+							{movieComments.map(comment => (
+								<Box key={comment.id} sx={{ 
+									display: 'flex', 
+									gap: 1,
+									p: 1,
+									backgroundColor: theme.palette.background.default,
+									borderRadius: 1
+								}}>
+									<Avatar 
+										src={comment.userAvatar}
+										alt={comment.userName}
+										sx={{ width: 32, height: 32 }}
+									/>
+									<Box sx={{ flex: 1 }}>
+										<Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+											<Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: "0.9rem" }}>
+												{comment.userName}
+											</Typography>
+											<Typography variant="caption" color="text.secondary">
+												{new Date(comment.createdAt).toLocaleDateString()}
+											</Typography>
+										</Box>
+										<Typography variant="body2" sx={{ fontSize: "0.85rem" }}>
+											{comment.content}
 										</Typography>
 									</Box>
-									<Typography variant="body2" sx={{ fontSize: "0.85rem" }}>
-										{comment.content}
-									</Typography>
 								</Box>
-							</Box>
-						))}
+							))}
 					</Box>
 				</Box>
 			</Collapse>
