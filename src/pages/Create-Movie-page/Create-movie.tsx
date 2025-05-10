@@ -13,6 +13,7 @@ const CreateMovie: React.FC = () => {
 		shortSynopsis: "",
 		longSynopsis: "",
 		teamComment: "",
+		history: "",
 	});
 
 	const [producers, setProducers] = useState<{ id: number; name: string }[]>([]);
@@ -111,7 +112,8 @@ const CreateMovie: React.FC = () => {
 				directorId: "",
 				shortSynopsis: "",
 				longSynopsis: "",
-				teamComment: ""
+				teamComment: "",
+				history: "",
 			});
 			setSelectedTags([]);
 			setSuccess(true);
@@ -259,6 +261,24 @@ const CreateMovie: React.FC = () => {
 											variant="outlined"
 											fullWidth
 											value={formData.teamComment}
+											onChange={handleChange}
+											multiline
+											rows={3}
+											sx={{ marginBottom: 3 }}
+										/>
+									</Grid>
+
+									{/* Section History de l'équipe */}
+									<Grid size={{ xs: 12, md: 6 }}>
+										<Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
+											Histoire ou anecdocte autour de la réalisation du film
+										</Typography>
+										<TextField
+											label="Histoire Anecdote"
+											name="history"
+											variant="outlined"
+											fullWidth
+											value={formData.history}
 											onChange={handleChange}
 											multiline
 											rows={3}

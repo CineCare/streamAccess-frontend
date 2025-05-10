@@ -16,6 +16,7 @@ const EditMovie: React.FC = () => {
 		shortSynopsis: "",
 		longSynopsis: "",
 		teamComment: "",
+		history: "",
 	});
 	const [producers, setProducers] = useState<{ id: number; name: string }[]>([]);
 	const [directors, setDirectors] = useState<{ id: number; name: string }[]>([]);
@@ -49,6 +50,7 @@ const EditMovie: React.FC = () => {
 					shortSynopsis: movie.shortSynopsis || "",
 					longSynopsis: movie.longSynopsis || "",
 					teamComment: movie.teamComment || "",
+					history: movie.history || "",
 				});
 				setProducers(producersList);
 				setDirectors(directorsList);
@@ -299,6 +301,17 @@ const EditMovie: React.FC = () => {
 								variant="outlined"
 								fullWidth
 								value={formData.longSynopsis}
+								onChange={handleTextFieldChange}
+								multiline
+								rows={4}
+								sx={{ marginBottom: 3 }}
+							/>
+							<TextField
+								label="Histoire et Anecdote"
+								name="history"
+								variant="outlined"
+								fullWidth
+								value={formData.history}
 								onChange={handleTextFieldChange}
 								multiline
 								rows={4}

@@ -12,6 +12,7 @@ export interface Movie {
 	shortSynopsis?: string | null;
 	longSynopsis?: string | null;
 	teamComment?: string | null;
+	history?: string | null;
 	tags: string[];
 }
 

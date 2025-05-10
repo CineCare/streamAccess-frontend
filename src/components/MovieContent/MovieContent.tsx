@@ -114,6 +114,24 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 					</Typography>
 				</Box>
 			</Box>
+			{/* Historique */}
+			<Box sx={{ p: 2 }}>
+					<Typography
+						variant="h6"
+						gutterBottom>
+						Histoire Anecdote
+					</Typography>
+					<Typography
+						variant="body1"
+						paragraph
+						sx={{
+							color: "text.secondary",
+							whiteSpace: "pre-wrap", // Permet de conserver les retours à la ligne
+							wordWrap: "break-word", // Permet de couper les mots trop longs
+						}}>
+						{movie.history || "Aucune information disponible."}
+					</Typography>
+				</Box>
 
 			{/* Bouton Signaler fixe en bas */}
 			<Box

@@ -402,6 +402,16 @@ const Movies = () => {
 													}}>
 													{selectedMovie.longSynopsis || "Non disponible"}
 												</Typography>
+												<Divider sx={{ marginBottom: 1 }} />
+												<Typography
+													variant="body1"
+													sx={{
+														marginBottom: 2,
+														whiteSpace: "pre-wrap", // Permet de conserver les retours à la ligne
+														wordWrap: "break-word", // Permet de couper les mots trop longs
+													}}>
+													<strong>Histoire/Anecdotes:</strong>{selectedMovie.history || "Non disponible"}
+												</Typography>
 											</Box>
 											<Box
 												sx={{
