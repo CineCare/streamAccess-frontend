@@ -68,6 +68,11 @@ pipeline {
                 expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'dev'}
             }
             steps {
+                //copy .env file from jenkins credentials to current workspace
+                withCredentials([file(credentialsId: "dev_env", variable: 'envFile')]){
+                    sh 'cp $envFile $WORKSPACE'
+                }
+                
                 //connect to docker hub, build image and push to registry
                 sh '''
                     echo $DOCKER_CREDENTIALS_PSW | docker login localhost:5000 -u $DOCKER_CREDENTIALS_USR --password-stdin
