@@ -57,6 +57,10 @@ pipeline {
         stage('build') {
             steps {
                 echo 'performing build'
+                //copy .env file from jenkins credentials to current workspace
+                withCredentials([file(credentialsId: "front_env_dev", variable: 'envFile')]){
+                    sh 'cp $envFile $WORKSPACE'
+                }
                 sh '''
                     npm run build
                 '''
