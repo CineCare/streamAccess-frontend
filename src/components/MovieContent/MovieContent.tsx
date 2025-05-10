@@ -113,8 +113,7 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 						{movie.longSynopsis || "Aucun synopsis disponible."}
 					</Typography>
 				</Box>
-			</Box>
-			{/* Historique */}
+				{/* Historique */}
 			<Box sx={{ p: 2 }}>
 					<Typography
 						variant="h6"
@@ -132,7 +131,8 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 						{movie.history || "Aucune information disponible."}
 					</Typography>
 				</Box>
-
+			</Box>
+	
 			{/* Bouton Signaler fixe en bas */}
 			<Box
 				sx={{
