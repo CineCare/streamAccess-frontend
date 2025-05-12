@@ -5,7 +5,7 @@ import { combineReducers } from "redux";
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 import { AuthState, AccessibilityState, AccessibilityColors, MoviesState, Comment } from "../types/interfaces";
 import { fetchAllMovies } from "../services/FetcherService";
-import { initialCommentsState, initialNotificationsState, initialTagsState } from "../data/mockData";
+import { initialNotificationsState, initialTagsState } from "../data/mockData";
 
 // État initial pour les couleurs des catégories
 const initialColorsState: AccessibilityColors = {
@@ -198,7 +198,7 @@ export const { markNotificationAsRead, markAllNotificationsAsRead } = notificati
 // Slice pour les commentaires
 const commentsSlice = createSlice({
 	name: "comments",
-	initialState: initialCommentsState,
+	initialState: {} as { list: [] } as { list: Comment[] },
 	reducers: {
 		addComment: (state, action: PayloadAction<Comment>) => {
 			state.list.unshift(action.payload);

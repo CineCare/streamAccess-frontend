@@ -403,6 +403,7 @@ export const fetchTags = async (): Promise<{ id: number; label: string }[]> => {
 };
 
 // Création d'un tag
+// export const createTag = async (label: string, icon: string): Promise<void> => {
 export const createTag = async (label: string): Promise<void> => {
 	const token = localStorage.getItem("accessToken");
 	if (!token) throw new Error("Token manquant !");
@@ -413,7 +414,8 @@ export const createTag = async (label: string): Promise<void> => {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
 		},
-		body: JSON.stringify({ label }),
+		body: JSON.stringify({ label }), // <-- Ajout de icon dans le body
+		// body: JSON.stringify({ label, icon }), // <-- Ajout de icon dans le body
 	});
 
 	if (!response.ok) {
@@ -441,6 +443,7 @@ export const deleteTag = async (id: number): Promise<void> => {
 };
 
 // Mise à jour d'un tag
+// export const updateTag = async (id: number, label: string, icon: string): Promise<void> => {
 export const updateTag = async (id: number, label: string): Promise<void> => {
 	const token = localStorage.getItem("accessToken");
 	if (!token) throw new Error("Token manquant !");
@@ -451,7 +454,8 @@ export const updateTag = async (id: number, label: string): Promise<void> => {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
 		},
-		body: JSON.stringify({ label }),
+		body: JSON.stringify({ label }), // <-- Ajout de icon dans le body
+		// body: JSON.stringify({ label, icon }), // <-- Ajout de icon dans le body
 	});
 
 	if (!response.ok) {

@@ -241,7 +241,7 @@ const Navbar: React.FC = () => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 500,
+            width: 800,
             maxHeight: '80vh',
             overflowY: 'auto',
             bgcolor: 'background.paper',
