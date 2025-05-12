@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid, Typography, Paper, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar";
 import MovieManagement from "../../components/ContentManagement/MovieManagement";
 import TagManagement from "../../components/ContentManagement/TagManagement";
@@ -12,8 +12,8 @@ const ContentManagement: React.FC = () => {
   return (
     <>
       <Navbar />
-      <Box sx={{ padding: 3, backgroundColor: theme.palette.background.default}}>
-        <Paper
+      <Box sx={{ padding: 3, backgroundColor: theme.palette.background.default }}>
+        {/* <Paper
           elevation={3}
           sx={{
             padding: 3,
@@ -28,21 +28,32 @@ const ContentManagement: React.FC = () => {
           <Typography variant="body1" sx={{ color: theme.palette.text.secondary, marginTop: 1 }}>
             Gérez vos films, tags, commentaires et personnes depuis ce tableau de bord.
           </Typography>
-        </Paper>
-        <Grid container spacing={3}>
-          <Grid size={{ xs:12, sm:6, lg:4 }}>
-            <MovieManagement />
-          </Grid>
-          <Grid size={{ xs:12, sm:6, lg:4 }}>
-            <TagManagement />
-          </Grid>
-          <Grid size={{ xs:12, sm:6, lg:4 }}>
-            <CommentManagement />
-          </Grid>
-          <Grid size={{ xs:12, sm:6, lg:4 }}>
-            <PersonManagement />
-          </Grid>
-        </Grid>
+        </Paper> */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gridTemplateRows: "1fr 1fr",
+            gridTemplateAreas: `
+              "movies tags comments"
+              "persons tags comments"
+            `,
+            gap: 3,
+          }}
+        >
+          <Box sx={{ gridArea: "movies", height: "100%", width: "100%" }}>
+            <MovieManagement sx={{ height: "100%", width: "100%" }} />
+          </Box>
+          <Box sx={{ gridArea: "tags", height: "100%", width: "100%" }}>
+            <TagManagement sx={{ height: "100%", width: "100%" }} />
+          </Box>
+          <Box sx={{ gridArea: "comments", height: "100%", width: "100%" }}>
+            <CommentManagement sx={{ height: "100%", width: "100%" }} />
+          </Box>
+          <Box sx={{ gridArea: "persons", height: "100%", width: "100%" }}>
+            <PersonManagement sx={{ height: "100%", width: "100%" }} />
+          </Box>
+        </Box>
       </Box>
     </>
   );

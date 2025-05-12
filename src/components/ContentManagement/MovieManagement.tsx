@@ -7,8 +7,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteMovie } from "../../services/FetcherService";
 import useFetchMovies from "../../hooks/useFetchMovies";
+import MovieIcon from "@mui/icons-material/Movie";
 
-const MovieManagement: React.FC = () => {
+const MovieManagement: React.FC<{ sx?: object }> = ({ sx = {} }) => {
 	// Navigation et état global
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -53,10 +54,13 @@ const MovieManagement: React.FC = () => {
 		: movies;
 
 	return (
-		<Box sx={{ padding: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-			<Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
-				Gestion des films
-			</Typography>
+		<Box sx={{ padding: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", ...sx }}>
+			<Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+				<MovieIcon sx={{ marginRight: 1 }} />
+				<Typography variant="h6" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
+					Gestion des films
+				</Typography>
+			</Box>
 			<Typography variant="body1" sx={{ marginBottom: 2 }}>
 				Nombre total de films : {movies.length}
 			</Typography>

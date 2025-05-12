@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, TextField, MenuItem, Select, FormControl, InputLabel, List, ListItem, IconButton, Popover, Dialog, DialogTitle, DialogContent, DialogActions, SelectChangeEvent } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PeopleIcon from "@mui/icons-material/People";
 import { fetchProducers, fetchDirectors, createPerson, deletePerson, updatePerson, fetchTags, } from "../../services/FetcherService";
 
-const PersonManagement: React.FC = () => {
+const PersonManagement: React.FC<{ sx?: object }> = ({ sx = {} }) => {
 	const [producers, setProducers] = useState<{ id: number; name: string; biography?: string }[]>([]);
 	const [directors, setDirectors] = useState<{ id: number; name: string; biography?: string }[]>([]);
 	const [formData, setFormData] = useState({ name: "", role: "producer" as "producer" | "director" });
@@ -13,6 +14,7 @@ const PersonManagement: React.FC = () => {
 	const [success, setSuccess] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const [editDialogOpen, setEditDialogOpen] = useState(false);
+	const [loading, setLoading] = useState(false); // Ajout de l'état loading
 
 	// Fetch producers, directors, and tags on load
 	useEffect(() => {
@@ -47,7 +49,7 @@ const PersonManagement: React.FC = () => {
 	const handleSubmit = async () => {
 		setError(null);
 		setSuccess(false);
-
+		setLoading(true); // Ajout
 		try {
 			await createPerson(formData.name, formData.role);
 			setSuccess(true);
@@ -60,6 +62,7 @@ const PersonManagement: React.FC = () => {
 		} catch {
 			setError("Erreur lors de l'ajout de la personne.");
 		}
+		setLoading(false); // Ajout
 	};
 
 	const handleDelete = async (id: number, role: "producer" | "director") => {
@@ -115,10 +118,13 @@ const PersonManagement: React.FC = () => {
 	};
 
 	return (
-		<Box sx={{ padding: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1 }}>
-			<Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
-				Gestion des personnes
-			</Typography>
+		<Box sx={{ padding: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1, height: "100%", ...sx }}>
+			<Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+				<PeopleIcon sx={{ marginRight: 1 }} />
+				<Typography variant="h6" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
+					Gestion des personnes
+				</Typography>
+			</Box>
 
 			{/* Formulaire d'ajout */}
 			<Box sx={{ marginBottom: 3 }}>
@@ -144,7 +150,7 @@ const PersonManagement: React.FC = () => {
 						<MenuItem value="director">Réalisateur</MenuItem>
 					</Select>
 				</FormControl>
-				<Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
+				<Button variant="contained" color="primary" fullWidth onClick={handleSubmit} disabled={loading || !formData.name}>
 					Ajouter
 				</Button>
 				{error && (
