@@ -21,41 +21,26 @@ import {
 	Button,
 	Divider,
 } from "@mui/material";
-import DvrIcon from "@mui/icons-material/Dvr";
-import SubtitlesIcon from "@mui/icons-material/Subtitles";
+import * as MuiIcons from "@mui/icons-material"; // Pour affichage dynamique des icônes
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
-import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
-import WcIcon from '@mui/icons-material/Wc';
-import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
-import SmokingRoomsIcon from '@mui/icons-material/SmokingRooms';
-import ChurchIcon from '@mui/icons-material/Church';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Navbar from "../../components/Navbar/Navbar.tsx";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, fetchMovies, AppDispatch } from "../../providers/store";
+import { RootState, fetchMovies, AppDispatch, fetchTagsThunk } from "../../providers/store";
 import { Movie } from "../../types/interfaces";
-import useFetchMovies from "../../hooks/useFetchMovies";
 import { fetchProducers, fetchDirectors } from "../../services/FetcherService";
+import { Tooltip } from "@mui/material";
 
-const tagIcons: { [key: string]: ReactElement } = {
-	"Sous-titres disponibles": <SubtitlesIcon />,
-	"Audio description": <DvrIcon />,
-	"Scènes violentes": <SportsKabaddiIcon />,
-	"Sexe explicite": <WcIcon />,
-	"Anti stress": <SelfImprovementIcon />,
-	"Angoissant": <SentimentVeryDissatisfiedIcon />,
-	"Addiction": <SmokingRoomsIcon />,
-	"Deuil": <ChurchIcon />,
-};
 const moviesPerPage = 16;
 
 const Movies = () => {
 	const theme = useTheme();
 	const navigate = useNavigate();
-	const movies = useSelector((state: RootState) => state.movies.list); // Récupère la liste des films depuis le store
-	const tags = useSelector((state: RootState) => state.tags.list); // Récupère les tags depuis le store
+	const movies = useSelector((state: RootState) => state.movies.list);
+	const tags = useSelector((state: RootState) => state.tags) as { id: number; label: string; icon?: string }[];
+	const tagLabels = tags.map(t => t.label);
+
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [yearFilter, setYearFilter] = useState("");
@@ -89,7 +74,15 @@ const Movies = () => {
 	const filteredMovies = movies.filter(
 		movie =>
 			movie.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-			(selectedTags.length === 0 || selectedTags.every(tag => movie.tags.includes(tag))) &&
+			(
+				selectedTags.length === 0 ||
+				selectedTags.every(
+					tagLabel => {
+						const tagObj = tags.find(t => t.label === tagLabel);
+						return tagObj ? movie.tags.includes(tagObj.id) : false;
+					}
+				)
+			) &&
 			(yearFilter === "" || movie.releaseYear.toString() === yearFilter)
 	);
 
@@ -110,9 +103,23 @@ const Movies = () => {
 	
 	useEffect(() => {
 		dispatch(fetchMovies()); // Charge les films dans le store après authentification
+		dispatch(fetchTagsThunk()); // Fetch tags au montage
 	}, [dispatch]);
 
-	useFetchMovies(); // Utilise le hook pour charger les films
+	// Fonction utilitaire pour récupérer l'icône d'un tag par son id
+	const getTagIcon = (tagId: number) => {
+		const tagObj = tags.find(t => t.id === tagId);
+		const iconName = tagObj && tagObj.icon ? tagObj.icon : "LocalOffer";
+		const IconComp = MuiIcons[iconName as keyof typeof MuiIcons] || MuiIcons.LocalOffer;
+		// Ajout du Tooltip avec le label du tag
+		return (
+			<Tooltip title={tagObj?.label || ""} arrow>
+				<span>
+					<IconComp fontSize="small" />
+				</span>
+			</Tooltip>
+		);
+	};
 
 	return (
 		<Box>
@@ -138,7 +145,7 @@ const Movies = () => {
 					<Grid size={{ xs: 12, md: 4 }}>
 						<Autocomplete
 							multiple
-							options={tags} // Utilise les tags du store
+							options={tagLabels}
 							getOptionLabel={option => option}
 							value={selectedTags}
 							onChange={(_, newValue) => setSelectedTags(newValue)}
@@ -183,7 +190,10 @@ const Movies = () => {
 								justifyContent: "center",
 							}}>
 							{paginatedMovies.map(movie => {
-								const tagIconsToShow = movie.tags.map(tag => tagIcons[tag]);
+								// Affiche les icônes des tags par id
+								const tagIconsToShow = Array.isArray(movie.tags)
+									? movie.tags.map(tagId => getTagIcon(tagId))
+									: [];
 								return (
 									<Grid
 										size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 1.5 }}
@@ -234,7 +244,7 @@ const Movies = () => {
 															borderTopLeftRadius: 8,
 															borderBottomLeftRadius: 8,
 														}}
-														image={movie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${movie.image}` : "/images/camera.png"}
+														image={movie.image ? `${import.meta.env.VITE_BACKEND_URL}/assets/movies_images/${movie.image}` : "/images/camera.png"}
 														alt={`Affiche du film ${movie.title}`}
 														onError={e => {
 															(e.target as HTMLImageElement).onerror = null;
@@ -369,7 +379,7 @@ const Movies = () => {
 											<CardMedia
 												component="img"
 												sx={{ width: "100%", borderRadius: 1 }}
-												image={selectedMovie.image ? `https://streamaccess-dev-backend.codevert.org/assets/movies_images/${selectedMovie.image}` : "/images/camera.png"}
+												image={selectedMovie.image ? `${import.meta.env.VITE_BACKEND_URL}/assets/movies_images/${selectedMovie.image}` : "/images/camera.png"}
 												alt={`Affiche du film ${selectedMovie.title}`}
 											/>
 										</Grid>
