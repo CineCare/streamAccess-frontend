@@ -13,7 +13,7 @@ export interface Movie {
 	longSynopsis?: string | null;
 	teamComment?: string | null;
 	history?: string | null;
-	tags: string[];
+	tags: number[];
 }
 
 // Interface pour les erreurs API

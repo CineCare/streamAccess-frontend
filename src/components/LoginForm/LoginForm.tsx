@@ -49,7 +49,7 @@ const LoginForm: React.FC = () => {
 			localStorage.setItem("accessToken", accessToken);
 
 			const userData = await fetchUserInfo(accessToken);
-			dispatch(setUserInfo({ name: userData.pseudo, email: userData.email }));
+			dispatch(setUserInfo({ name: userData.pseudo, email: userData.email, avatar: userData.avatar ?? null }));
 
 			dispatch(login());
 			await ensureMoviesLoaded();

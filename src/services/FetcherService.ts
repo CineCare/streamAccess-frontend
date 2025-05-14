@@ -248,7 +248,7 @@ export const authenticateUser = async (email: string, password: string): Promise
 };
 
 // Récupération des informations utilisateur
-export const fetchUserInfo = async (accessToken: string): Promise<{ pseudo: string; email: string }> => {
+export const fetchUserInfo = async (accessToken: string): Promise<{ pseudo: string; email: string; avatar?: string | null }> => {
 	const response = await fetch(`${backendUrl}/users/me`, {
 		method: "GET",
 		headers: {
@@ -261,6 +261,42 @@ export const fetchUserInfo = async (accessToken: string): Promise<{ pseudo: stri
 		throw new Error("Erreur lors de la récupération des données utilisateur.");
 	}
 
+	return response.json();
+};
+
+// Mise à jour du profil utilisateur (pseudo, avatar, mot de passe)
+export const updateUserProfile = async (formData: {
+	pseudo: string;
+	avatar?: File | null;
+	actualPassword?: string;
+	newPassword?: string;
+	newPasswordConfirm?: string;
+}): Promise<{ pseudo: string; email: string; avatar?: string | null }> => {
+	const token = localStorage.getItem("accessToken");
+	if (!token) throw new Error("Token manquant !");
+
+	const formDataToSend = new FormData();
+	formDataToSend.append("pseudo", formData.pseudo);
+	if (formData.avatar) formDataToSend.append("avatar", formData.avatar);
+	if (formData.actualPassword && formData.newPassword) {
+		formDataToSend.append("actualPassword", formData.actualPassword);
+		formDataToSend.append("newPassword", formData.newPassword);
+		formDataToSend.append("newPasswordConfirm", formData.newPasswordConfirm || "");
+	}
+
+	const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3100";
+	const response = await fetch(`${backendUrl}/users/me`, {
+		method: "PUT",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+		body: formDataToSend,
+	});
+
+	if (!response.ok) {
+		const data = await response.json();
+		throw new Error(data.message || "Erreur lors de la modification du profil.");
+	}
 	return response.json();
 };
 
@@ -403,8 +439,7 @@ export const fetchTags = async (): Promise<{ id: number; label: string }[]> => {
 };
 
 // Création d'un tag
-// export const createTag = async (label: string, icon: string): Promise<void> => {
-export const createTag = async (label: string): Promise<void> => {
+export const createTag = async (label: string, icon: string): Promise<void> => {
 	const token = localStorage.getItem("accessToken");
 	if (!token) throw new Error("Token manquant !");
 
@@ -414,8 +449,7 @@ export const createTag = async (label: string): Promise<void> => {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
 		},
-		body: JSON.stringify({ label }), // <-- Ajout de icon dans le body
-		// body: JSON.stringify({ label, icon }), // <-- Ajout de icon dans le body
+		body: JSON.stringify({ label, icon }), // <-- Ajout de icon dans le body
 	});
 
 	if (!response.ok) {
@@ -443,8 +477,7 @@ export const deleteTag = async (id: number): Promise<void> => {
 };
 
 // Mise à jour d'un tag
-// export const updateTag = async (id: number, label: string, icon: string): Promise<void> => {
-export const updateTag = async (id: number, label: string): Promise<void> => {
+export const updateTag = async (id: number, label: string, icon: string): Promise<void> => {
 	const token = localStorage.getItem("accessToken");
 	if (!token) throw new Error("Token manquant !");
 
@@ -454,8 +487,7 @@ export const updateTag = async (id: number, label: string): Promise<void> => {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
 		},
-		body: JSON.stringify({ label }), // <-- Ajout de icon dans le body
-		// body: JSON.stringify({ label, icon }), // <-- Ajout de icon dans le body
+		body: JSON.stringify({ label, icon }), // <-- Ajout de icon dans le body
 	});
 
 	if (!response.ok) {

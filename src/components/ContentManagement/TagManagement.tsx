@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
 	Box, Typography, Button, TextField, List, ListItem, IconButton, Popover,
-	Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, InputAdornment, DialogContentText
+	Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, InputAdornment, DialogContentText, Tooltip
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -104,8 +104,7 @@ const TagManagement: React.FC<{ sx?: object }> = ({ sx = {} }) => {
 		setSuccess(null);
 		setLoading(true);
 		try {
-			// await createTag(formData.label, formData.icon);
-			await createTag(formData.label);
+			await createTag(formData.label, formData.icon);
 			setSuccess("Tag ajouté avec succès !");
 			setFormData({ label: "", icon: filteredIcons[0]?.name || "LocalOffer" });
 			const tagsList = await fetchTags();
@@ -156,8 +155,7 @@ const TagManagement: React.FC<{ sx?: object }> = ({ sx = {} }) => {
 		if (!editData) return;
 		setLoading(true);
 		try {
-			// await updateTag(editData.id, editData.label, editData.icon);
-			await updateTag(editData.id, editData.label);
+			await updateTag(editData.id, editData.label, editData.icon);
 			const tagsList = await fetchTags();
 			setTags(tagsList);
 			setSuccess("Tag modifié avec succès !");
@@ -231,44 +229,45 @@ const TagManagement: React.FC<{ sx?: object }> = ({ sx = {} }) => {
 				{/* Liste d'icônes paginée */}
 				<Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 2 }}>
 					{paginatedIcons.map(icon => (
-						<Box
-							key={icon.name}
-							onClick={() => handleIconSelect(icon.name)}
-							sx={{
-								display: "flex",
-								flexDirection: "column",
-								alignItems: "center",
-								justifyContent: "center",
-								cursor: "pointer",
-								border: formData.icon === icon.name
-									? `2px solid ${theme.palette.primary.main}`
-									: `1px solid ${theme.palette.divider}`,
-								borderRadius: 2,
-								padding: 1,
-								width: 60,
-								height: 60,
-								backgroundColor: formData.icon === icon.name
-									? theme.palette.primary.light
-									: theme.palette.background.paper,
-								color: formData.icon === icon.name
-									? theme.palette.primary.contrastText
-									: theme.palette.text.primary,
-								transition: "border 0.2s, background 0.2s",
-								"&:hover": {
-									border: `2px solid ${theme.palette.primary.main}`,
-									backgroundColor: theme.palette.action.hover,
-								},
-							}}
-						>
-							{React.cloneElement(icon.component, {
-								sx: {
-									fontSize: 32,
+						<Tooltip key={icon.name} title={icon.label} arrow>
+							<Box
+								onClick={() => handleIconSelect(icon.name)}
+								sx={{
+									display: "flex",
+									flexDirection: "column",
+									alignItems: "center",
+									justifyContent: "center",
+									cursor: "pointer",
+									border: formData.icon === icon.name
+										? `2px solid ${theme.palette.primary.main}`
+										: `1px solid ${theme.palette.divider}`,
+									borderRadius: 2,
+									padding: 1,
+									width: 60,
+									height: 60,
+									backgroundColor: formData.icon === icon.name
+										? theme.palette.primary.light
+										: theme.palette.background.paper,
 									color: formData.icon === icon.name
-										? theme.palette.primary.main
+										? theme.palette.primary.contrastText
 										: theme.palette.text.primary,
-								}
-							})}
-						</Box>
+									transition: "border 0.2s, background 0.2s",
+									"&:hover": {
+										border: `2px solid ${theme.palette.primary.main}`,
+										backgroundColor: theme.palette.action.hover,
+									},
+								}}
+							>
+								{React.cloneElement(icon.component, {
+									sx: {
+										fontSize: 32,
+										color: formData.icon === icon.name
+											? theme.palette.primary.main
+											: theme.palette.text.primary,
+									}
+								})}
+							</Box>
+						</Tooltip>
 					))}
 				</Box>
 				{totalIconPages > 1 && (
@@ -383,47 +382,46 @@ const TagManagement: React.FC<{ sx?: object }> = ({ sx = {} }) => {
 					{/* Liste d'icônes paginée pour édition */}
 					<Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 2 }}>
 						{paginatedIcons.map(icon => (
-							<Box
-								key={icon.name}
-								onClick={() => handleEditIconSelect(icon.name)}
-								sx={{
-									display: "flex",
-									flexDirection: "column",
-									alignItems: "center",
-									justifyContent: "center",
-									cursor: "pointer",
-									border: editData?.icon === icon.name
-										? `2px solid ${theme.palette.primary.main}`
-										: `1px solid ${theme.palette.divider}`,
-									borderRadius: 2,
-									padding: 1,
-									width: 60,
-									height: 60,
-									backgroundColor: editData?.icon === icon.name
-										? theme.palette.primary.light
-										: theme.palette.background.paper,
-									color: editData?.icon === icon.name
-										? theme.palette.primary.contrastText
-										: theme.palette.text.primary,
-									transition: "border 0.2s, background 0.2s",
-									"&:hover": {
-										border: `2px solid ${theme.palette.primary.main}`,
-										backgroundColor: theme.palette.action.hover,
-									},
-								}}
-							>
-								{React.cloneElement(icon.component, {
-									sx: {
-										fontSize: 32,
+							<Tooltip key={icon.name} title={icon.label} arrow>
+								<Box
+									onClick={() => handleEditIconSelect(icon.name)}
+									sx={{
+										display: "flex",
+										flexDirection: "column",
+										alignItems: "center",
+										justifyContent: "center",
+										cursor: "pointer",
+										border: editData?.icon === icon.name
+											? `2px solid ${theme.palette.primary.main}`
+											: `1px solid ${theme.palette.divider}`,
+										borderRadius: 2,
+										padding: 1,
+										width: 60,
+										height: 60,
+										backgroundColor: editData?.icon === icon.name
+											? theme.palette.primary.light
+											: theme.palette.background.paper,
 										color: editData?.icon === icon.name
-											? theme.palette.primary.main
+											? theme.palette.primary.contrastText
 											: theme.palette.text.primary,
-									}
-								})}
-								<Typography variant="caption" sx={{ fontSize: 10, textAlign: "center" }}>
-									{icon.label}
-								</Typography>
-							</Box>
+										transition: "border 0.2s, background 0.2s",
+										"&:hover": {
+											border: `2px solid ${theme.palette.primary.main}`,
+											backgroundColor: theme.palette.action.hover,
+										},
+									}}
+								>
+									{React.cloneElement(icon.component, {
+										sx: {
+											fontSize: 32,
+											color: editData?.icon === icon.name
+												? theme.palette.primary.main
+												: theme.palette.text.primary,
+										}
+									})}
+									{/* Label supprimé, remplacé par Tooltip */}
+								</Box>
+							</Tooltip>
 						))}
 					</Box>
 					{totalIconPages > 1 && (

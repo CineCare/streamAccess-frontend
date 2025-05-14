@@ -4,8 +4,8 @@ import { persistReducer, persistStore } from "redux-persist";
 import { combineReducers } from "redux";
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 import { AuthState, AccessibilityState, AccessibilityColors, MoviesState, Comment } from "../types/interfaces";
-import { fetchAllMovies } from "../services/FetcherService";
-import { initialNotificationsState, initialTagsState } from "../data/mockData";
+import { fetchAllMovies, fetchTags } from "../services/FetcherService";
+import { initialNotificationsState } from "../data/mockData";
 
 // État initial pour les couleurs des catégories
 const initialColorsState: AccessibilityColors = {
@@ -117,25 +117,27 @@ const accessibilitySlice = createSlice({
 export const { setPreference, setThemePreference } = accessibilitySlice.actions;
 
 // Slice utilisateur
+type UserState = {
+	name: string;
+	email: string;
+	avatar: string | null;
+};
+
 const userSlice = createSlice({
 	name: "user",
 	initialState: {
 		name: "",
 		email: "",
-		avatar: localStorage.getItem("userAvatar") || null, // Null déclenchera l'affichage de l'icône
-	},
+		avatar: null,
+	} as UserState,
 	reducers: {
 		setUserAvatar: (state, action) => {
-			state.avatar = action.payload; // Peut être null
-			if (action.payload) {
-				localStorage.setItem("userAvatar", action.payload);
-			} else {
-				localStorage.removeItem("userAvatar");
-			}
+			state.avatar = action.payload; // Peut être null ou string
 		},
-		setUserInfo: (state, action: PayloadAction<{ name: string; email: string }>) => {
+		setUserInfo: (state, action: PayloadAction<{ name: string; email: string; avatar?: string | null }>) => {
 			state.name = action.payload.name;
 			state.email = action.payload.email;
+			state.avatar = action.payload.avatar ?? null;
 		},
 	},
 });
@@ -208,10 +210,25 @@ const commentsSlice = createSlice({
 
 export const { addComment } = commentsSlice.actions;
 
+// Thunk pour récupérer les tags (retourne un tableau d'objets { id, label, icon })
+export const fetchTagsThunk = createAsyncThunk("tags/fetchTags", async (_, { rejectWithValue }) => {
+	try {
+		return await fetchTags();
+	} catch (error) {
+		return rejectWithValue(error instanceof Error ? error.message : "Erreur inconnue");
+	}
+});
+
+// Correction du slice tags : le state est un tableau d'objets { id, label, icon }
 const tagsSlice = createSlice({
 	name: "tags",
-	initialState: initialTagsState,
+	initialState: [] as { id: number; label: string; icon?: string }[],
 	reducers: {},
+	extraReducers: builder => {
+		builder.addCase(fetchTagsThunk.fulfilled, (_state, action) => {
+			return action.payload;
+		});
+	},
 });
 
 export const tagsReducer = tagsSlice.reducer;
