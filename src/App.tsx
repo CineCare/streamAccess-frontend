@@ -12,6 +12,7 @@ import { AccessibilityThemeManager } from "./styles/AccessibilityThemeManager";
 import ContentManagement from "./pages/ContentManagement/ContentManagement";
 import EditMovie from "./pages/EditMovie/EditMovie";
 import AccessibilityOptionsPage from "./pages/AccessibilityOptionsPage";
+import WSProvider from "./providers/WSProvider";
 // import WSProvider from "./providers/WSProvider";
 // import { useSocket } from "./hooks/useSocket";
 
@@ -24,7 +25,7 @@ const ProtectedRoute: React.FC = () => {
   }
   // Wrap Outlet in a WS Provider
   // return <WSProvider><Outlet /></WSProvider>;
-  return <Outlet />;
+  return <WSProvider><Outlet /></WSProvider>;
 };
 
 const App: React.FC = () => {
