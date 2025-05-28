@@ -46,7 +46,7 @@ const AccessibilityOptions: React.FC = () => {
 	const theme = useTheme();
 
 	const [accessibilityTab, setAccessibilityTab] = useState(0);
-	const [fontSize, setFontSize] = useState<number>(typeof preferences.visual?.fontSize === "number" ? preferences.visual.fontSize : 14);
+	const [fontSize, setFontSize] = useState<number>(typeof preferences.visual?.fontSize === "number" ? preferences.visual.fontSize : 18);
 	const [language, setLanguage] = useState<string>(typeof preferences.general?.language === "string" ? preferences.general.language : "fr");
 
 	// Changement d'onglet
@@ -77,16 +77,17 @@ const AccessibilityOptions: React.FC = () => {
 				scrollButtons="auto"
 				sx={{
 					"& .MuiTabs-indicator": {
-						backgroundColor: (theme.palette[categoryColors[Object.keys(accessibilityOptions)[accessibilityTab]]] as PaletteColor)?.main, // Couleur sous l'onglet actif
+						backgroundColor: (theme.palette[categoryColors[Object.keys(accessibilityOptions)[accessibilityTab]]] as PaletteColor)?.main,
 					},
 					"& .MuiTab-root.Mui-selected": {
-						color: (theme.palette[categoryColors[Object.keys(accessibilityOptions)[accessibilityTab]]] as PaletteColor)?.main, // Texte de l'onglet actif
+						color: (theme.palette[categoryColors[Object.keys(accessibilityOptions)[accessibilityTab]]] as PaletteColor)?.main,
 					},
 				}}>
 				{tabTitles.map((title, index) => (
 					<Tab
 						key={index}
 						label={title}
+						// Ne pas toucher à la taille des icônes ici, laisser la taille par défaut de MUI
 					/>
 				))}
 			</Tabs>
@@ -101,15 +102,12 @@ const AccessibilityOptions: React.FC = () => {
 								<Typography
 									variant="h5"
 									gutterBottom>
-									{tabTitles[index]} {/* Affiche le titre correspondant */}
+									{tabTitles[index]}
 								</Typography>
 								<FormGroup>
 									{options.map(({ key, label }) => {
-										// Récupérer la couleur de la catégorie depuis le thème
-										const colorKey = categoryColors[category]; // Ex: "primary", "success", etc.
+										const colorKey = categoryColors[category];
 										const paletteColor = theme.palette[colorKey as keyof typeof theme.palette];
-
-										// Vérifier que la couleur a bien une propriété "main"
 										const checkboxColor = typeof paletteColor === "object" && "main" in paletteColor ? paletteColor.main : String(paletteColor);
 
 										return (
@@ -124,6 +122,7 @@ const AccessibilityOptions: React.FC = () => {
 															"&.Mui-checked": {
 																color: checkboxColor,
 															},
+															// Supprimer toute règle sur .MuiSvgIcon-root pour ne pas impacter la taille des icônes
 														}}
 													/>
 												}
@@ -146,15 +145,15 @@ const AccessibilityOptions: React.FC = () => {
 												max={24}
 												valueLabelDisplay="auto"
 												sx={{
-													color: (theme.palette[categoryColors["visual"]] as PaletteColor).main, // ✅ Applique la couleur dynamique
+													color: (theme.palette[categoryColors["visual"]] as PaletteColor).main,
 													"& .MuiSlider-thumb": {
-														backgroundColor: (theme.palette[categoryColors["visual"]] as PaletteColor).main, // ✅ Change la couleur du curseur
+														backgroundColor: (theme.palette[categoryColors["visual"]] as PaletteColor).main,
 													},
 													"& .MuiSlider-track": {
-														backgroundColor: (theme.palette[categoryColors["visual"]] as PaletteColor).main, // ✅ Change la couleur de la barre
+														backgroundColor: (theme.palette[categoryColors["visual"]] as PaletteColor).main,
 													},
 													"& .MuiSlider-rail": {
-														backgroundColor: (theme.palette[categoryColors["visual"]] as PaletteColor).light, // ✅ Ajuste le rail
+														backgroundColor: (theme.palette[categoryColors["visual"]] as PaletteColor).light,
 													},
 												}}
 											/>

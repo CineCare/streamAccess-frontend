@@ -104,12 +104,14 @@ const accessibilitySlice = createSlice({
 		setPreference: (state, action: PayloadAction<{ category: string; option: string; value: boolean | string | number }>) => {
 			const { category, option, value } = action.payload;
 			if (state.preferences[category] && state.preferences[category][option] !== undefined) {
-				state.preferences[category][option] = value; // On s'assure de bien mettre à jour la valeur boolean
+				state.preferences[category][option] = value;
+				// Persistance optionnelle dans localStorage si besoin
+				localStorage.setItem("accessibilityPreferences", JSON.stringify(state.preferences));
 			}
 		},
 		setThemePreference: (state, action: PayloadAction<string>) => {
-			state.preferences.general.theme = action.payload; // Met à jour le thème dans Redux
-			localStorage.setItem("theme", action.payload); // Sauvegarde le thème dans localStorage
+			state.preferences.general.theme = action.payload;
+			localStorage.setItem("theme", action.payload);
 		},
 	},
 });
