@@ -3,42 +3,29 @@ import React, { useMemo } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, setThemePreference } from "../providers/store"; // Import de l'action Redux
-import { defaultTheme, highContrastTheme, softTheme, largeTextTheme, lightTheme } from "./theme";
+import { createAccessibleTheme } from "./theme";
 import { ThemeContext, ThemeType } from "./ThemeContext"; // Import du type ThemeType
 
 export const AccessibilityThemeManager: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useDispatch();
-  const theme = useSelector((state: RootState) => state.accessibility.preferences.general.theme || "default") as ThemeType;
+  const preferences = useSelector((state: RootState) => state.accessibility.preferences);
 
-  // Mettre à jour le contexte avec le thème actuel
+  const allowedThemes: ThemeType[] = ["default", "highContrast", "soft", "lightTheme", "largeText"];
+  const rawTheme = preferences.general?.theme;
+  const themeName: ThemeType = allowedThemes.includes(rawTheme as ThemeType) ? (rawTheme as ThemeType) : "default";
+
   const contextValue = useMemo(
     () => ({
-      theme,
+      theme: themeName,
       setTheme: (newTheme: ThemeType) => {
-        dispatch(setThemePreference(newTheme)); // Met à jour le thème dans le store Redux
+        dispatch(setThemePreference(newTheme));
       },
     }),
-    [theme, dispatch]
+    [themeName, dispatch]
   );
 
-  // Déterminer le thème actuel
-  const currentTheme = useMemo(() => {
-    switch (theme) {
-      case "highContrast":
-        return highContrastTheme;
-      case "soft":
-        return softTheme;
-      case "lightTheme":
-        return lightTheme;
-      case "largeText":
-        return largeTextTheme;
-      case "default":
-        return defaultTheme;
-      default:
-        console.error(`Thème inconnu : ${theme}. Utilisation du thème par défaut.`);
-        return defaultTheme;
-    }
-  }, [theme]);
+  // Générer dynamiquement le thème selon toutes les préférences
+  const currentTheme = useMemo(() => createAccessibleTheme(preferences), [preferences]);
 
   return (
     <ThemeContext.Provider value={contextValue}>

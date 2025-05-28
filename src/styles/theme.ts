@@ -1,4 +1,5 @@
-import { createTheme } from "@mui/material/styles";
+import { AccessibilityPreferences } from "../types/interfaces";
+import { ThemeOptions, createTheme } from "@mui/material/styles";
 
 // Thème par défaut
 export const defaultTheme = createTheme({
@@ -206,3 +207,193 @@ export const largeTextTheme = createTheme({
 		fontFamily: "'Arial', sans-serif",
 	},
 });
+
+export function createAccessibleTheme(preferences: AccessibilityPreferences) {
+	const baseTheme =
+		preferences.general?.theme === "highContrast"
+			? highContrastTheme
+			: preferences.general?.theme === "soft"
+			? softTheme
+			: preferences.general?.theme === "lightTheme"
+			? lightTheme
+			: preferences.general?.theme === "largeText"
+			? largeTextTheme
+			: defaultTheme;
+
+	const fontSize = typeof preferences.visual?.fontSize === "number" ? preferences.visual.fontSize : baseTheme.typography.fontSize;
+
+	const paletteOverrides: Partial<ThemeOptions["palette"]> = {};
+	if (preferences.general?.softMode) {
+		paletteOverrides.background = {
+			...baseTheme.palette.background,
+			default: "#f5f7fa",
+			paper: "#e9f0f6",
+		};
+	}
+
+	return createTheme({
+		...baseTheme,
+		typography: {
+			...baseTheme.typography,
+			fontSize,
+		},
+		palette: {
+			...baseTheme.palette,
+			...paletteOverrides,
+		},
+		components: {
+			...baseTheme.components,
+			MuiCssBaseline: {
+				styleOverrides: {
+					body: {
+						fontSize: `${fontSize}px !important`,
+					},
+				},
+			},
+			MuiTypography: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiButton: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiInputBase: {
+				styleOverrides: {
+					input: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiInputLabel: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiTab: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiMenuItem: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiChip: {
+				styleOverrides: {
+					label: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiListItemText: {
+				styleOverrides: {
+					primary: {
+						fontSize: "inherit",
+					},
+					secondary: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiTableCell: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiTablePagination: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiBreadcrumbs: {
+				styleOverrides: {
+					li: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiAlert: {
+				styleOverrides: {
+					message: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiDialogTitle: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiDialogContentText: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiCardContent: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiFormLabel: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiFormHelperText: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiSelect: {
+				styleOverrides: {
+					select: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiSlider: {
+				styleOverrides: {
+					valueLabel: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			MuiPaginationItem: {
+				styleOverrides: {
+					root: {
+						fontSize: "inherit",
+					},
+				},
+			},
+			// PAS de règle sur .MuiSvgIcon-root : les icônes gardent leur taille d'origine
+		},
+	});
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
@@ -30,6 +30,8 @@ import List from '@mui/material/List'; // Import de la liste
 import ListItem from '@mui/material/ListItem'; // Import des éléments de la liste
 import ListItemText from '@mui/material/ListItemText'; // Import du texte des éléments
 import Button from '@mui/material/Button'; // Import du bouton
+import { IoProvider } from '../../interfaces/IIoProvider';
+import useIoSocket from '../../hooks/useSocket';
 
 const Navbar: React.FC = () => {
   const theme = useTheme();
@@ -38,6 +40,9 @@ const Navbar: React.FC = () => {
   const { avatar } = useAvatar();
   const notifications = useSelector((state: RootState) => state.notifications.list); // Sélecteur pour les notifications
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  //essai WS
+  const { ioClose, socket } = useIoSocket() as IoProvider;
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [themeDrawerOpen, setThemeDrawerOpen] = useState(false);
@@ -67,6 +72,28 @@ const Navbar: React.FC = () => {
   const handleMarkAllAsRead = () => {
     dispatch(markAllNotificationsAsRead()); // Marque toutes les notifications comme lues
   };
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Connecté au serveur WebSocket'); // Affiche un message de connexion dans la console
+    })
+
+    socket.on('disconnect', (reason) => {
+      console.log('Déconnecté du serveur WebSocket : ', reason); // Affiche un message de déconnexion dans la console
+      })
+    
+    socket.on('welcome', (message: string) => {
+      console.log(message); // Affiche le message de bienvenue dans la console
+    })
+
+    socket.on('message', (message: string) => {
+      console.log('Message reçu : ', message); // Affiche le message reçu dans la console
+    })
+
+    return () => {
+      ioClose();
+    }
+  })
 
   return (
     <AppBar position="sticky">

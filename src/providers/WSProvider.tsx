@@ -1,39 +1,28 @@
-import { ReactNode, useEffect } from "react";
-import { useSocket } from "../hooks/useSocket";
+import { ReactNode } from "react";
+import socketIOClient from "socket.io-client";
+import IoSocketContext from "../contexts/IoSocketContext";
 
 type IoSocketProviderProps = {
     children: ReactNode;
 };
 
 function WSProvider({ children }: IoSocketProviderProps) {
-    const socket = useSocket();
+    const ioUrl = "https://streamaccess-dev-backend.codevert.org/events";
+    const socket = socketIOClient(ioUrl, { extraHeaders: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } });
 
-    useEffect(() => {
-        if (socket) {
-            socket.on("connect", () => {
-                console.log("Connecté au serveur WebSocket");
-            });
+    function ioClose() {
+        socket.close();
+    }
 
-            socket.on("disconnect", () => {
-                console.log("Déconnecté du serveur WebSocket");
-            });
+    const value = {
+        socket,
+        ioClose,
+    }
 
-            // Exemple : écoute d'un événement personnalisé
-            socket.on("message", (data) => {
-                console.log("Notification reçue :", data);
-            });
-        }
-
-        return () => {
-            if (socket) {
-                socket.off("connect");
-                socket.off("disconnect");
-                socket.off("message");
-            }
-        };
-    }, [socket]);
-
-    return <>{children}</>;
+    return (
+        <IoSocketContext.Provider value={value}>
+            {children}
+        </IoSocketContext.Provider>)
 }
 
 export default WSProvider;
