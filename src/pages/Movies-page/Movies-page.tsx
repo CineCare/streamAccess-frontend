@@ -420,6 +420,7 @@ const Movies = () => {
 														marginBottom: 2,
 														whiteSpace: "pre-wrap", // Permet de conserver les retours à la ligne
 														wordWrap: "break-word", // Permet de couper les mots trop longs
+														textAlign: "justify",
 													}}>
 													<strong>Histoire/Anecdotes:</strong><br/>{selectedMovie.history || "Non disponible"}
 												</Typography>
