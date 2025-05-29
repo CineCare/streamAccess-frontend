@@ -1,7 +1,9 @@
-import React from "react";
-import { Box, Typography, Button, Chip, useTheme } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Typography, Button, Chip, useTheme, Drawer, IconButton } from "@mui/material";
 import FormatSizeIcon from "@mui/icons-material/FormatSize";
 import LanguageIcon from "@mui/icons-material/Language";
+import CloseIcon from "@mui/icons-material/Close";
+import TuneIcon from "@mui/icons-material/Tune";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, setPreference, selectCategoryColors } from "../../providers/store";
 
@@ -9,7 +11,9 @@ const SelectedPreferences: React.FC = () => {
 	const dispatch = useDispatch();
 	const preferences = useSelector((state: RootState) => state.accessibility.preferences);
 	const categoryColors = useSelector(selectCategoryColors);
-	const theme = useTheme(); // Récupère le thème MUI
+	const theme = useTheme();
+
+	const [drawerOpen, setDrawerOpen] = useState(false);
 
 	// Labels des préférences
 	const preferenceLabels: {
@@ -74,15 +78,9 @@ const SelectedPreferences: React.FC = () => {
 							removable: !(key === "language" || key === "fontSize"),
 							icon:
 								key === "fontSize" ? (
-									<FormatSizeIcon
-										color="inherit"
-										fontSize="small"
-									/>
+									<FormatSizeIcon color="inherit" fontSize="small" />
 								) : key === "language" ? (
-									<LanguageIcon
-										color="inherit"
-										fontSize="small"
-									/>
+									<LanguageIcon color="inherit" fontSize="small" />
 								) : null,
 						};
 
@@ -98,6 +96,8 @@ const SelectedPreferences: React.FC = () => {
 
 		return [...fixedPreferences, ...selectedPreferences];
 	};
+
+	const selectedPreferences = getSelectedPreferences();
 
 	// Réinitialisation des préférences
 	const handleResetPreferences = () => {
@@ -115,82 +115,168 @@ const SelectedPreferences: React.FC = () => {
 		console.log("Préférences sauvegardées :", preferences);
 	};
 
-	// Récupère les préférences sélectionnées
-	const selectedPreferences = getSelectedPreferences();
-
+	// Affichage minimal : Chip avec nombre de préférences actives
 	return (
-		<Box
-			sx={{
-				position: "absolute",
-				top: 16,
-				left: 16,
-				zIndex: 1000,
-				padding: 2,
-				backgroundColor: theme.palette.background.paper,
-				borderRadius: 2,
-				boxShadow: 3,
-				width: "auto",
-				maxWidth: "37%",
-			}}>
-			<Typography
-				variant="h6"
-				gutterBottom>
-				Préférences sélectionnées
-			</Typography>
-
-			{/* Affichage des préférences activées */}
-			<Box sx={{ marginBottom: 2 }}>
-				{selectedPreferences.length > 0 ? (
-					selectedPreferences.map(pref => {
-						// Récupérer la couleur de la catégorie depuis le thème
-						const colorKey = categoryColors[pref.category];
-						const paletteColor = theme.palette[colorKey as keyof typeof theme.palette];
-
-						// Vérifier que la couleur est bien un objet avec `.main`
-						const chipColor = typeof paletteColor === "object" && "main" in paletteColor ? paletteColor.main : (paletteColor as string);
-						const chipTextColor = typeof paletteColor === "object" && "contrastText" in paletteColor ? paletteColor.contrastText : "#FFF";
-
-						return (
-							<Chip
-								key={pref.key}
-								label={pref.label}
-								icon={pref.icon || undefined}
-								onDelete={pref.removable ? () => dispatch(setPreference({ category: pref.category, option: pref.key, value: false })) : undefined}
-								variant={pref.removable ? "outlined" : "filled"}
+		<>
+			<Chip
+				label={
+					<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+						<TuneIcon fontSize="small" />
+						<Typography component="span" sx={{ fontWeight: "bold", fontSize: 16 }}>
+							Préférences actives
+						</Typography>
+						<Box
+							component="span"
+							sx={{
+								display: "inline-flex",
+								alignItems: "center",
+								justifyContent: "center",
+								width: 26,
+								height: 26,
+								borderRadius: "50%",
+								ml: 0.5,
+								backgroundColor: theme.palette.getContrastText(
+									theme.palette.mode === "dark"
+										? theme.palette.primary.light
+										: theme.palette.primary.main
+								),
+							}}
+						>
+							<Typography
+								component="span"
 								sx={{
-									margin: 0.5,
-									...(pref.removable
-										? { borderColor: chipColor, color: chipColor } // Pour "outlined"
-										: { backgroundColor: chipColor, color: chipTextColor }), // Pour "filled"
+									fontWeight: "bold",
+									fontSize: 16,
+									color: theme.palette.mode === "dark"
+										? theme.palette.primary.light
+										: theme.palette.primary.main,
+									lineHeight: 1,
 								}}
-							/>
-						);
-					})
-				) : (
-					<Typography
-						variant="body2"
-						color="textSecondary">
-						Aucune préférence sélectionnée
-					</Typography>
-				)}
-			</Box>
+							>
+								{selectedPreferences.length}
+							</Typography>
+						</Box>
+					</Box>
+				}
+				color="primary"
+				variant="filled"
+				clickable
+				onClick={() => setDrawerOpen(true)}
+				sx={{
+					position: "absolute",
+					top: 16,
+					left: 16,
+					zIndex: 1200,
+					fontWeight: "bold",
+					fontSize: 16,
+					boxShadow: 2,
+					// Amélioration de la visibilité du Chip selon le thème
+					backgroundColor: theme.palette.mode === "dark"
+						? theme.palette.primary.light
+						: theme.palette.primary.main,
+					color: theme.palette.getContrastText(
+						theme.palette.mode === "dark"
+							? theme.palette.primary.light
+							: theme.palette.primary.main
+					),
+					"& .MuiChip-icon": {
+						color: theme.palette.getContrastText(
+							theme.palette.mode === "dark"
+								? theme.palette.primary.light
+								: theme.palette.primary.main
+						),
+					},
+				}}
+				data-testid="selected-preferences-chip"
+			/>
 
-			{/* Boutons de gestion des préférences */}
-			<Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-				<Button
-					variant="contained"
-					color="secondary"
-					onClick={handleResetPreferences}>
-					Vider toutes les préférences
-				</Button>
-				<Button
-					variant="contained"
-					color="primary"
-					onClick={handleSavePreferences}>
-					Sauvegarder les préférences
-				</Button>
-			</Box>
-		</Box>
+			<Drawer
+				anchor="left"
+				open={drawerOpen}
+				onClose={() => setDrawerOpen(false)}
+				PaperProps={{
+					sx: {
+						width: { xs: "90vw", sm: 400 },
+						maxWidth: 500,
+						padding: 0,
+						backgroundColor: theme.palette.background.paper,
+						display: "flex",
+						flexDirection: "column",
+						height: "100%",
+					},
+				}}
+			>
+				<Box sx={{ p: 2, flex: "1 1 auto", overflowY: "auto" }}>
+					<Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+						<Typography variant="h6" gutterBottom>
+							Préférences sélectionnées
+						</Typography>
+						<IconButton onClick={() => setDrawerOpen(false)} size="small">
+							<CloseIcon />
+						</IconButton>
+					</Box>
+					<Box sx={{ marginBottom: 2 }}>
+						{selectedPreferences.length > 0 ? (
+							selectedPreferences.map(pref => {
+								const colorKey = categoryColors[pref.category];
+								const paletteColor = theme.palette[colorKey as keyof typeof theme.palette];
+								const chipColor = typeof paletteColor === "object" && "main" in paletteColor ? paletteColor.main : (paletteColor as string);
+								const chipTextColor = typeof paletteColor === "object" && "contrastText" in paletteColor ? paletteColor.contrastText : "#FFF";
+								return (
+									<Chip
+										key={pref.key}
+										label={pref.label}
+										icon={pref.icon || undefined}
+										onDelete={pref.removable ? () => dispatch(setPreference({ category: pref.category, option: pref.key, value: false })) : undefined}
+										variant={pref.removable ? "outlined" : "filled"}
+										sx={{
+											margin: 0.5,
+											...(pref.removable
+												? { borderColor: chipColor, color: chipColor }
+												: { backgroundColor: chipColor, color: chipTextColor }),
+										}}
+									/>
+								);
+							})
+						) : (
+							<Typography variant="body2" color="textSecondary">
+								Aucune préférence sélectionnée
+							</Typography>
+						)}
+					</Box>
+				</Box>
+				<Box
+					sx={{
+						p: 2,
+						borderTop: `1px solid ${theme.palette.divider}`,
+						display: "flex",
+						justifyContent: "space-between",
+						gap: 2,
+						position: "sticky",
+						bottom: 0,
+						backgroundColor: theme.palette.background.paper,
+						zIndex: 1,
+					}}
+				>
+					<Button
+						variant="contained"
+						color="secondary"
+						onClick={handleResetPreferences}
+						fullWidth
+					>
+						Vider toutes les préférences
+					</Button>
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={handleSavePreferences}
+						fullWidth
+					>
+						Sauvegarder les préférences
+					</Button>
+				</Box>
+			</Drawer>
+		</>
 	);
 };
 

@@ -19,16 +19,8 @@ const AuthPage: React.FC = () => {
 
 	return (
 		<Box sx={{ width: "100%", maxWidth: "60vw", margin: "auto", padding: 2, textAlign: "center" }}>
-			<Box
-				sx={{
-					position: "absolute",
-					top: 16, // Ajuster la distance du haut
-					left: 16, // Ajuster la distance de la gauche
-					zIndex: 1000, // Assurer que le composant reste au-dessus du contenu
-					width: "99%", // Ajuster la largeur
-				}}>
-				<SelectedPreferences />
-			</Box>
+			{/* Drawer SelectedPreferences minimal */}
+			<SelectedPreferences />
 			<EcoStats />
 			<Box
 				component="figure"

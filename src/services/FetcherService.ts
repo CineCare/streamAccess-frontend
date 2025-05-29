@@ -28,19 +28,12 @@ export const fetchMovieById = async (id: number): Promise<Movie> => {
 
 // Récupération de l'URL du flux vidéo
 export const fetchStreamUrl = async (): Promise<string> => {
-	const token = localStorage.getItem("accessToken") || "mockToken"; // Ajout d'une valeur par défaut
+	const token = localStorage.getItem("accessToken") || "mockToken";
 	if (!token) throw new Error("Token manquant !");
 
-	const response = await fetch(`${backendUrl}/streams/`, {
-		headers: { Authorization: `Bearer ${token}` },
-	});
-
-	if (!response.ok) {
-		throw new Error("Erreur lors de la récupération du flux");
-	}
-
-	const blob = await response.blob();
-	return URL.createObjectURL(blob);
+	// Retourner directement l'URL du flux vidéo avec le token en query param ou header
+	// Ici, on retourne l'URL du backend, le token sera ajouté côté client dans le header
+	return `${backendUrl}/streams/`;
 };
 
 // Création d'un film
