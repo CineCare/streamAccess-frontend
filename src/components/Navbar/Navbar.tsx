@@ -80,17 +80,31 @@ const Navbar: React.FC = () => {
 
     socket.on('disconnect', (reason) => {
       console.log('Déconnecté du serveur WebSocket : ', reason); // Affiche un message de déconnexion dans la console
-      })
+    })
     
     socket.on('welcome', (message: string) => {
       console.log(message); // Affiche le message de bienvenue dans la console
     })
 
-    socket.on('message', (message: string) => {
-      console.log('Message reçu : ', message); // Affiche le message reçu dans la console
+    socket.on('movies', (message: string) => {
+      console.log('Films : ', message); // Affiche le message reçu dans la console
+    })
+
+    socket.on('users', (message: string) => {
+      console.log('Utilisateurs : ', message); // Affiche le message reçu dans la console
+    })
+
+    socket.on('team', (message: string) => {
+      console.log('News : ', message); // Affiche le message reçu dans la console
     })
 
     return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('welcome');
+      socket.off('movies');
+      socket.off('users');
+      socket.off('team');
       ioClose();
     }
   })
