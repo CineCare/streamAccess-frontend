@@ -88,7 +88,7 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 								</Box>
 							)}
 							<Divider sx={{ my: 1 }} />
-							<Typography variant="body1" sx={{ marginBottom: 2, fontStyle: "italic", color: "gray" }}>
+							<Typography variant="body1" sx={{ marginBottom: 2, fontStyle: "italic", color: "text.secondary", textAlign: "justify" }}>
 								<strong>Commentaire de l'équipe :</strong> {movie.teamComment || "Non disponible"}
 							</Typography>
 						</Box>
