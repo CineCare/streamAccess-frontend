@@ -88,8 +88,13 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 								</Box>
 							)}
 							<Divider sx={{ my: 1 }} />
-							<Typography variant="body1" sx={{ marginBottom: 2, fontStyle: "italic", color: "gray" }}>
-								<strong>Commentaire de l'équipe :</strong> {movie.teamComment || "Non disponible"}
+							<Typography
+								variant="h6"
+								gutterBottom>
+								Commentaire de l'équipe :
+							</Typography>
+							<Typography variant="body1" sx={{ marginBottom: 2, fontStyle: "italic", color: "text.secondary", textAlign: "justify" }}>
+								{movie.teamComment || "Non disponible"}
 							</Typography>
 						</Box>
 					</Box>
@@ -109,6 +114,7 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 							color: "text.secondary",
 							whiteSpace: "pre-wrap", // Permet de conserver les retours à la ligne
 							wordWrap: "break-word", // Permet de couper les mots trop longs
+							textAlign: "justify",
 						}}>
 						{movie.longSynopsis || "Aucun synopsis disponible."}
 					</Typography>
@@ -127,6 +133,7 @@ const MovieContent: React.FC<MovieContentProps> = ({ movie, producerName, direct
 							color: "text.secondary",
 							whiteSpace: "pre-wrap", // Permet de conserver les retours à la ligne
 							wordWrap: "break-word", // Permet de couper les mots trop longs
+							textAlign: "justify",
 						}}>
 						{movie.history || "Aucune information disponible."}
 					</Typography>
