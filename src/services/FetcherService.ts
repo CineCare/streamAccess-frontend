@@ -131,6 +131,7 @@ export const updateMovie = async (
 		longSynopsis?: string;
 		shortSynopsis?: string;
 		teamComment?: string;
+		history?: string;
 	}
 ): Promise<void> => {
 	const token = localStorage.getItem("accessToken");
@@ -145,6 +146,7 @@ export const updateMovie = async (
 	if (formData.longSynopsis) formDataToSend.append("longSynopsis", formData.longSynopsis);
 	if (formData.shortSynopsis) formDataToSend.append("shortSynopsis", formData.shortSynopsis);
 	if (formData.teamComment) formDataToSend.append("teamComment", formData.teamComment);
+	if (formData.history) formDataToSend.append("history", formData.history || "");
 
 	const response = await fetch(`${backendUrl}/movies/${id}`, {
 		method: "PUT",

@@ -410,6 +410,7 @@ const Movies = () => {
 														marginBottom: 2,
 														whiteSpace: "pre-wrap", // Permet de conserver les retours à la ligne
 														wordWrap: "break-word", // Permet de couper les mots trop longs
+														textAlign: "justify",
 													}}>
 													{selectedMovie.longSynopsis || "Non disponible"}
 												</Typography>
@@ -420,8 +421,9 @@ const Movies = () => {
 														marginBottom: 2,
 														whiteSpace: "pre-wrap", // Permet de conserver les retours à la ligne
 														wordWrap: "break-word", // Permet de couper les mots trop longs
+														textAlign: "justify",
 													}}>
-													<strong>Histoire/Anecdotes:</strong>{selectedMovie.history || "Non disponible"}
+													<strong>Histoire/Anecdotes:</strong><br/>{selectedMovie.history || "Non disponible"}
 												</Typography>
 											</Box>
 											<Box
@@ -432,8 +434,8 @@ const Movies = () => {
 												}}>
 												<Typography
 													variant="body2"
-													sx={{ fontStyle: "italic", color: "gray" }}>
-													<strong>Commentaire de l'équipe :</strong> {selectedMovie.teamComment || "Non disponible"}
+													sx={{ fontStyle: "italic", textAlign: "justify" }}>
+													<strong>Commentaire de l'équipe :</strong><br/>{selectedMovie.teamComment || "Non disponible"}
 												</Typography>
 											</Box>
 										</Grid>
