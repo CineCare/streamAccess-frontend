@@ -32,6 +32,8 @@ import ListItemText from '@mui/material/ListItemText'; // Import du texte des é
 import Button from '@mui/material/Button'; // Import du bouton
 import { IoProvider } from '../../interfaces/IIoProvider';
 import useIoSocket from '../../hooks/useSocket';
+import Chatbot from '../Chatbot/Chatbot';
+
 
 const Navbar: React.FC = () => {
   const theme = useTheme();
@@ -47,6 +49,7 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [themeDrawerOpen, setThemeDrawerOpen] = useState(false);
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
+  const [,setContactOpen] = useState(false);
 
   const handleNotificationClick = (id: number) => {
     dispatch(markNotificationAsRead(id)); // Marque une notification comme lue
@@ -80,17 +83,31 @@ const Navbar: React.FC = () => {
 
     socket.on('disconnect', (reason) => {
       console.log('Déconnecté du serveur WebSocket : ', reason); // Affiche un message de déconnexion dans la console
-      })
+    })
     
     socket.on('welcome', (message: string) => {
       console.log(message); // Affiche le message de bienvenue dans la console
     })
 
-    socket.on('message', (message: string) => {
-      console.log('Message reçu : ', message); // Affiche le message reçu dans la console
+    socket.on('movies', (message: string) => {
+      console.log('Films : ', message); // Affiche le message reçu dans la console
+    })
+
+    socket.on('users', (message: string) => {
+      console.log('Utilisateurs : ', message); // Affiche le message reçu dans la console
+    })
+
+    socket.on('team', (message: string) => {
+      console.log('News : ', message); // Affiche le message reçu dans la console
     })
 
     return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('welcome');
+      socket.off('movies');
+      socket.off('users');
+      socket.off('team');
       ioClose();
     }
   })
@@ -108,6 +125,11 @@ const Navbar: React.FC = () => {
         
         {/* Onglet Films et icône de thème */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Chatbot actionsCtx={{
+        navigate,                     // 👈 très important
+        openContact: () => setContactOpen(true),
+        fetchJson: (url) => fetch(url).then(r => r.json()),
+      }}/>
           <Link to="/movies" style={{ textDecoration: "none", color: "inherit", marginRight: 10 }}>
             <Typography variant="body1" component="span" sx={{ fontWeight: "bold", marginRight: 2 }}>
               RÉPERTOIRE

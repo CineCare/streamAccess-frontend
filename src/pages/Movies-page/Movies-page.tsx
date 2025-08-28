@@ -131,6 +131,7 @@ const Movies = () => {
 				<Grid
 					container
 					spacing={2}
+					aria-label="Filtres et recherche de films"
 					alignItems="center">
 					<Grid size={{ xs: 12, md: 4 }}>
 						<TextField
