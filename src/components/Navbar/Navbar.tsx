@@ -135,6 +135,11 @@ const Navbar: React.FC = () => {
               RÉPERTOIRE
             </Typography>
           </Link>
+          <Link to="/blog" style={{ textDecoration: "none", color: "inherit", marginRight: 10 }}>
+            <Typography variant="body1" component="span" sx={{ fontWeight: "bold", marginRight: 2 }}>
+              BLOG
+            </Typography>
+          </Link>
           <IconButton
             color="inherit"
             onClick={() => setThemeDrawerOpen(true)} // Mettre à jour le nom de la fonction

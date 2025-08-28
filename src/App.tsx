@@ -12,6 +12,7 @@ import { AccessibilityThemeManager } from "./styles/AccessibilityThemeManager";
 import ContentManagement from "./pages/ContentManagement/ContentManagement";
 import EditMovie from "./pages/EditMovie/EditMovie";
 import AccessibilityOptionsPage from "./pages/AccessibilityOptionsPage";
+import BlogPage from "./pages/Blog-page/BlogPage";
 import WSProvider from "./providers/WSProvider";
 // import WSProvider from "./providers/WSProvider";
 // import { useSocket } from "./hooks/useSocket";
@@ -51,6 +52,7 @@ const App: React.FC = () => {
             <Route path="/content-management" element={<ContentManagement />} />
             <Route path="/editmovie/:id" element={<EditMovie />} />
             <Route path="/accessibility-options" element={<AccessibilityOptionsPage />} />
+            <Route path="/blog" element={<BlogPage />} />
           </Route>
         </Routes>
       </Router>
