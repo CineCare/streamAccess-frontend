@@ -33,6 +33,8 @@ import Button from '@mui/material/Button'; // Import du bouton
 import { IoProvider } from '../../interfaces/IIoProvider';
 import useIoSocket from '../../hooks/useSocket';
 import Chatbot from '../Chatbot/Chatbot';
+import FeedbackDialog from '../FeedbackDialog/FeedbackDialog'; // <-- Ajout
+import EditSquareIcon from '@mui/icons-material/EditSquare'; // Icône pour le feedback
 
 
 const Navbar: React.FC = () => {
@@ -50,6 +52,7 @@ const Navbar: React.FC = () => {
   const [themeDrawerOpen, setThemeDrawerOpen] = useState(false);
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
   const [,setContactOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false); // <-- Ajout
 
   const handleNotificationClick = (id: number) => {
     dispatch(markNotificationAsRead(id)); // Marque une notification comme lue
@@ -135,11 +138,20 @@ const Navbar: React.FC = () => {
               RÉPERTOIRE
             </Typography>
           </Link>
+          <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
           <Link to="/blog" style={{ textDecoration: "none", color: "inherit", marginRight: 10 }}>
             <Typography variant="body1" component="span" sx={{ fontWeight: "bold", marginRight: 2 }}>
               BLOG
             </Typography>
           </Link>
+          <IconButton
+            color="inherit"
+            onClick={() => setFeedbackOpen(true)}
+            sx={{ marginRight: 2 }}
+            aria-label="Donner un retour d'expérience"
+          >
+            <EditSquareIcon /> {/* Icône Feedback MUI */}
+          </IconButton>
           <IconButton
             color="inherit"
             onClick={() => setThemeDrawerOpen(true)} // Mettre à jour le nom de la fonction
@@ -349,6 +361,8 @@ const Navbar: React.FC = () => {
           </Button>
         </Box>
       </Modal>
+
+
     </AppBar>
   );
 };

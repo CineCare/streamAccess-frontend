@@ -97,3 +97,59 @@ export interface ThemeContextProps {
 	theme: ThemeType;
 	setTheme: (theme: ThemeType) => void;
 }
+
+export interface FeedbackData {
+	titre: string;
+	realisation: string;
+	pays: string;
+	annee: string;
+	duree: string;
+	langues: string;
+	moment: string;
+	momentAutre: string;
+	dispositif: string[];
+	audio: string[];
+	aides: string[];
+	aidesAutre: string;
+	presence: string;
+	interactions: string;
+	trouverFilm: number;
+	activerAides: number;
+	obstacles: string[];
+	obstaclesAutre: string;
+	probleme: string;
+	audioSensoriel: string;
+	lumiere: string;
+	mouvements: string;
+	autresFacteurs: string;
+	ceQuiMaAide: string;
+	ressenti: string;
+	ceQuiMeReste: string;
+	suivreHistoire: string;
+	pourquoi: string;
+	conscienceFiltres: number;
+	aspectsInfluence: string;
+	ceQueCeFilmMaFait: string;
+	ceQueJaimerais: string;
+	ceQueJeVeuxGarder: string;
+	silenceCommeReponse: boolean;
+	silencePourquoi: string;
+	dessin: File | null;
+	audioFichier: File | null;
+	chargeCognitive: number;
+	aisance: number;
+	aidesMieuxSoutenu: string;
+	motsCles: string[];
+	motsPerso: string;
+	autresContenus: string;
+	influenceReception: string;
+	autresUsages: string;
+	anonyme: boolean;
+	autorisation: boolean;
+	contact: string;
+}
+
+export interface FeedbackDialogProps {
+	open: boolean;
+	onClose: () => void;
+}
